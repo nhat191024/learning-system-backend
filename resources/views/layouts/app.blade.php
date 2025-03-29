@@ -36,6 +36,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
+<!-- datatables center -->
+<style>
+    #datatables th,
+    #datatables td {
+        text-align: center;
+    }
+</style>
+
 <!-- Page styles -->
 @isset($style)
     {{ $style }}
