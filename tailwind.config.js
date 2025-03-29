@@ -9,13 +9,18 @@ export default {
         './resources/views/**/*.blade.php',
     ],
 
+    darkMode: 'class', // Enable class-based dark mode
+
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['Lexend', ...defaultTheme.fontFamily.sans],
             },
         },
     },
 
-    plugins: [forms],
+    plugins: [forms, require("daisyui")],
+    daisyui: {
+        themes: ['light', 'dark'],
+    }
 };
