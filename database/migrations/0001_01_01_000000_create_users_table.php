@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('avatar')->default('upload/avt/default.png');
             $table->string('password');
+            $table->string('name');
+            $table->string('gender')->nullable();
+            $table->enum('role_id', [1, 2, 3, 4]); // 1 = admin, 2 = teacher, 3 = user, 4 = class Supervisor
+            $table->tinyInteger('status')->default(1); // 1 là hoạt động, 0 là vô hiệu hóa
             $table->rememberToken();
             $table->timestamps();
         });
