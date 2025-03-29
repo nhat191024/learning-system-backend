@@ -198,4 +198,28 @@
     });
 </script>
 
+<!-- datatables initialization -->
+<script>
+    $(document).ready(function() {
+        $('#datatables').DataTable({
+            language: {
+                "entries per page": "số bản ghi mỗi trang",
+                "search": "Tìm kiếm",
+                "info": "Hiển thị _START_ đến _END_ của _TOTAL_ bản ghi",
+                "infoEmpty": "Showing 0 to 0 of 0 entries",
+                "emptyTable": "Không có dữ liệu",
+                "zeroRecords": "Không tìm thấy dữ liệu phù hợp",
+                "infoFiltered": "(filtered from _MAX_ total records)",
+                "lengthMenu": "Hiển thị _MENU_ bản ghi",
+                paginate: {
+                    "first": "",
+                    "last": "",
+                    "next": "Tiếp theo",
+                    "previous": "Trước đó"
+                }
+            }
+        });
+    });
+</script>
+
 </html>
