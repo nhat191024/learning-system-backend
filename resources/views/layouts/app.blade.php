@@ -28,6 +28,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
+<!-- Page styles -->
+@isset($style)
+    {{ $style }}
+@endisset
+
 <body class="font-sans antialiased">
     <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
         @include('layouts.navigation')
@@ -46,6 +51,11 @@
             {{ $slot }}
         </main>
     </div>
+
+    <!-- page script -->
+    @isset($script)
+        {{ $script }}
+    @endisset
 
     <!-- Dark Mode Toggle Script -->
     <script>
