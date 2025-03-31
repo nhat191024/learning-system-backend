@@ -63,7 +63,6 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:student']], function () 
         Route::post('submit', [AssignmentController::class, 'submitAssignment']);
     });
 
-    Route::get('/user', [ProfileController::class, 'showProfile'])->name('user.profile.show');
-    Route::post('/user/update', [ProfileController::class, 'updateProfile'])->name('user.profile.update');
-    Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+    Route::get('/user', [ProfileController::class, 'showProfile']);
+    Route::post('/user/update', [ProfileController::class, 'updateProfile']);
 });
