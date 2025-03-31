@@ -14,9 +14,9 @@
         if (localStorage.getItem('color-theme') === 'dark' ||
             (!('color-theme' in localStorage) &&
                 window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
+            document.documentElement.setAttribute('data-theme', 'dark');
         } else {
-            document.documentElement.classList.remove('dark');
+            document.documentElement.setAttribute('data-theme', 'light');
         }
     </script>
 
@@ -136,53 +136,13 @@
 
 <!-- Dark Mode Toggle Script -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Get the toggle button
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
-        const themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+    $(document).ready(function() {
+        const themeController = $('#theme-controller');
 
-        // Function to show the correct icon based on the theme
-        function updateIcon(isDark) {
-            themeToggleLightIcon.classList.add('hidden');
-            themeToggleDarkIcon.classList.add('hidden');
-
-            if (isDark) {
-                themeToggleLightIcon.classList.remove('hidden');
-            } else {
-                themeToggleDarkIcon.classList.remove('hidden');
-            }
-        }
-
-        // Initial setup based on previous settings
-        const isDarkMode = localStorage.getItem('color-theme') === 'dark' ||
-            (!('color-theme' in localStorage) &&
-                window.matchMedia('(prefers-color-scheme: dark)').matches);
-
-        if (isDarkMode) {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
-
-        // Update the icon to match current theme
-        updateIcon(isDarkMode);
-
-        // Add click event for the toggle button
-        themeToggleBtn.addEventListener('click', function() {
-            // If dark mode is active
-            const isDark = document.documentElement.classList.contains('dark');
-
-            if (isDark) {
-                document.documentElement.classList.remove('dark');
-                localStorage.setItem('color-theme', 'light');
-            } else {
-                document.documentElement.classList.add('dark');
-                localStorage.setItem('color-theme', 'dark');
-            }
-
-            // Update icon to match new theme (opposite of previous state)
-            updateIcon(!isDark);
+        themeController.on('change', function() {
+            const isDark = themeController.is(':checked');
+            localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
         });
     });
 </script>
