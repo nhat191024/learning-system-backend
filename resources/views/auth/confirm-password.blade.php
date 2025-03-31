@@ -8,11 +8,11 @@
 
         <!-- Password -->
         <div>
-            <x-input-label for="password" :value="__('Password')" />
+            <x-inputs.input-label for="password" :value="__('Password')" />
 
-            <x-text-input id="password" class="mt-1 block w-full" name="password" type="password" required autocomplete="current-password" />
+            <x-inputs.text-input id="password" class="mt-1 block w-full" name="password" type="password" required autocomplete="current-password" />
 
-            <x-input-error class="mt-2" :messages="$errors->get('password')" />
+            <x-inputs.input-error class="mt-2" :messages="$errors->get('password')" />
         </div>
 
         <div class="mt-4 flex justify-end">
