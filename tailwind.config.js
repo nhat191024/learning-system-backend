@@ -9,7 +9,7 @@ export default {
         './resources/views/**/*.blade.php',
     ],
 
-    darkMode: 'class', // Enable class-based dark mode
+    darkMode: 'class',
 
     theme: {
         extend: {
@@ -19,8 +19,5 @@ export default {
         },
     },
 
-    plugins: [forms, require("daisyui")],
-    daisyui: {
-        themes: ['light', 'dark'],
-    }
+    plugins: [forms],
 };
