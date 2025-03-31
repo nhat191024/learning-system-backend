@@ -13,7 +13,7 @@
             <x-utils.application-logo class="h-15 block w-auto fill-current text-gray-800 dark:text-gray-200" />
             <div class="divider font-bold">{{ config('app.name', 'Laravel') }}</div>
             <li>
-                <h2 class="my-2 text-lg font-bold text-gray-400">{{ __('Function') }}</h2>
+                <h2 class="my-2 text-lg font-bold text-gray-800 dark:text-gray-400">{{ __('Function') }}</h2>
                 <ul>
                     <li>
                         <x-actions.sidebar-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.index')">
