@@ -24,32 +24,9 @@ class ClassController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Classes::query();
-
-            if ($request->filled('search')) {
-
-                $searchTerm = '%' . $request->search . '%';
-                $query->where('name', 'like', $searchTerm)
-                    ->orWhere('code', 'like', $searchTerm)
-                    ->orWhereHas('teacher', function ($q) use ($searchTerm) {
-                        $q->where('name', 'like', $searchTerm);
-                    });
-            }
-            $perPage = $request->get('per_page', 25);
-            $classes = $query->paginate($perPage);
-
-            $studentsNotInClass = $classes->mapWithKeys(function ($class) {
-                $students = User::where('role_id', 3)
-                    ->whereDoesntHave('enrollments', function ($query) use ($class) {
-                        $query->where('class_id', $class->id);
-                    })
-                    ->get();
-                return [$class->id => $students];
-            });
-
+            $classes = Classes::with('categories', 'teacher')->get();
             $teachers = User::where('role_id', 2)->get();
-
-            return view('admin.class.index', compact('classes', 'studentsNotInClass', 'teachers'));
+            return view('admin.class.index', compact('classes', 'teachers'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
         }
@@ -77,27 +54,55 @@ class ClassController extends Controller
         }
     }
 
-    public function hideClass(Request $request)
+    /**
+     * Show detail of the class
+     */
+    public function detail($id, $assignment_id = null)
     {
-        $class_id = $request->class_id;
-        $class = Classes::find($class_id);
+        $class_id = $id;
+        $class = Classes::with(['assignments.quizzes.choices'])->findOrFail($id);
+        $certificates = Certificate::all();
+        $studentsNotInClass = User::where('role_id', 3)
+            ->whereDoesntHave('enrollments', function ($query) use ($class) {
+                $query->where('class_id', $class->id);
+            })
+            ->get();
 
-        if (!$class) {
-            return redirect()->back()->with('error', 'Lớp không tồn tại');
-        }
-
-        $newStatus = $class->status === 'published' ? 'closed' : 'published';
-        $class->update(['status' => $newStatus]);
-
-        $message = $newStatus === 'closed' ? 'Đã ẩn lớp học!' : 'Đã hiển thị lớp học!';
-        return redirect()->back()->with('success', $message);
+        $assignment = $assignment_id ? ClassAssignment::with('quizzes.choices')->findOrFail($assignment_id) : null;
+        return view('class.show', compact('class', 'class_id', 'studentsNotInClass', 'assignment', 'certificates'));
     }
 
-    public function editClass($id)
+    /**
+     * Destroy the specified class.
+     */
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            $class = Classes::find($id);
+
+            if (!$class) {
+                return redirect()->back()->with('error', 'Class does not exist');
+            }
+
+            $newStatus = $class->status === 'published' ? 'closed' : 'published';
+            $class->update(['status' => $newStatus]);
+
+            DB::commit();
+
+            $message = $newStatus === 'closed' ? 'Class has been hidden!' : 'Class has been displayed!';
+            return redirect()->back()->with('success', $message);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
+        }
+    }
+
+    public function edit($id)
     {
         $class = Classes::findOrFail($id);
-        $teachersNotInClass = User::where('role_id', 2)->get();
-        return view('class.edit', compact('class', 'teachersNotInClass'));
+        $teachers = User::where('role_id', 2)->get();
+        return view('class.edit', compact('class', 'teachers'));
     }
 
     public function updateClass(Request $request, $id)
@@ -125,22 +130,6 @@ class ClassController extends Controller
             'teacher_id' => $request->teacher_id,
         ]);
         return redirect()->route('classes.index')->with('success', 'Lớp học đã được cập nhật.');
-    }
-
-    public function show($id, $assignment_id = null)
-    {
-        $class_id = $id;
-        $class = Classes::with(['assignments.quizzes.choices'])->findOrFail($id);
-        $certificates = Certificate::all();
-        // dd($courseEnrollments);
-        $studentsNotInClass = User::where('role_id', 3)
-            ->whereDoesntHave('enrollments', function ($query) use ($class) {
-                $query->where('class_id', $class->id);
-            })
-            ->get();
-
-        $assignment = $assignment_id ? ClassAssignment::with('quizzes.choices')->findOrFail($assignment_id) : null;
-        return view('class.show', compact('class', 'class_id', 'studentsNotInClass', 'assignment', 'certificates'));
     }
 
     public function assignmentDetailsJson($assignment_id)
