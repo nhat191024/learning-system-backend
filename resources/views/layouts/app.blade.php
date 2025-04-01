@@ -166,6 +166,22 @@
 
             $(this).select2(options);
         });
+
+        // Initialize select2 for modal
+        $('.select-search-modal').each(function() {
+            let options = {
+                theme: 'tailwindcss-3',
+                width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-full') ?
+                    '100%' : 'style',
+                placeholder: $(this).data('placeholder') || 'Select an option',
+                allowClear: Boolean($(this).data('allow-clear')),
+                closeOnSelect: !$(this).attr('multiple'),
+                tags: Boolean($(this).data('tags')),
+                dropdownParent: $('.myModal'),
+            };
+
+            $(this).select2(options);
+        });
     });
 </script>
 
