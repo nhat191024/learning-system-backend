@@ -29,6 +29,7 @@
                             <th>{{ __('No.') }}</th>
                             <th>{{ __('Code') }}</th>
                             <th>{{ __('Name') }}</th>
+                            <th>{{ __('Category') }}</th>
                             <th>{{ __('Description') }}</th>
                             <th>{{ __('Teacher') }}</th>
                             <th>{{ __('Status') }}</th>
@@ -40,6 +41,13 @@
                                 <td>{{ ++$key }}</td>
                                 <td>{{ $class->code }}</td>
                                 <td>{{ $class->name }}</td>
+                                <td>
+                                    @forelse ($class->categories as $category)
+                                        <span class="badge badge-lg badge-info">{{ $category->name }}</span>
+                                    @empty
+                                        <span class="badge badge-lg badge-error">{{ __('No category') }}</span>
+                                    @endforelse
+                                </td>
                                 <td>{{ $class->description }}</td>
                                 <td>{{ $class->teacher->name }}</td>
                                 <td>
