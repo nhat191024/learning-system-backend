@@ -9,7 +9,7 @@
         </p>
     </header>
 
-    <x-buttons.danger-button onclick="confirmUserDeletion.showModal()">{{ __('Delete Account') }}</x-buttons.danger-button>
+    <x-buttons.danger onclick="confirmUserDeletion.showModal()">{{ __('Delete Account') }}</x-buttons.danger>
 
     <x-actions.modal :id="'confirmUserDeletion'">
         <form method="post" action="{{ route('profile.destroy') }}">
@@ -33,9 +33,9 @@
             </div>
 
             <div class="modal-action">
-                <x-buttons.danger-button class="ms-3">
+                <x-buttons.danger class="ms-3">
                     {{ __('Delete Account') }}
-                </x-buttons.danger-button>
+                </x-buttons.danger>
             </div>
         </form>
     </x-actions.modal>
