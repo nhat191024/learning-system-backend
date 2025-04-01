@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html class="dark" lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
     <meta charset="utf-8">
@@ -15,8 +15,10 @@
             (!('color-theme' in localStorage) &&
                 window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark');
         } else {
             document.documentElement.setAttribute('data-theme', 'light');
+            document.documentElement.classList.remove('dark');
         }
     </script>
 
@@ -143,6 +145,7 @@
             const isDark = themeController.is(':checked');
             localStorage.setItem('color-theme', isDark ? 'dark' : 'light');
             document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+            document.documentElement.classList.toggle('dark', isDark);
         });
     });
 </script>
@@ -155,7 +158,7 @@
                 theme: 'tailwindcss-3',
                 width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-full') ?
                     '100%' : 'style',
-                placeholder: $(this).data('placeholder') || 'Chọn một lựa chọn',
+                placeholder: $(this).data('placeholder') || 'Select an option',
                 allowClear: Boolean($(this).data('allow-clear')),
                 closeOnSelect: !$(this).attr('multiple'),
                 tags: Boolean($(this).data('tags')),
@@ -170,22 +173,23 @@
 <script>
     $(document).ready(function() {
         $('#datatables').DataTable({
-            language: {
-                "entries per page": "số bản ghi mỗi trang",
-                "search": "Tìm kiếm",
-                "info": "Hiển thị _START_ đến _END_ của _TOTAL_ bản ghi",
-                "infoEmpty": "Showing 0 to 0 of 0 entries",
-                "emptyTable": "Không có dữ liệu",
-                "zeroRecords": "Không tìm thấy dữ liệu phù hợp",
-                "infoFiltered": "(filtered from _MAX_ total records)",
-                "lengthMenu": "Hiển thị _MENU_ bản ghi",
-                paginate: {
-                    "first": "",
-                    "last": "",
-                    "next": "Tiếp theo",
-                    "previous": "Trước đó"
-                }
-            }
+            {{-- * uncomment when website using other language --}}
+            // language: {
+            //     "entries per page": "số bản ghi mỗi trang",
+            //     "search": "Tìm kiếm",
+            //     "info": "Hiển thị _START_ đến _END_ của _TOTAL_ bản ghi",
+            //     "infoEmpty": "Showing 0 to 0 of 0 entries",
+            //     "emptyTable": "Không có dữ liệu",
+            //     "zeroRecords": "Không tìm thấy dữ liệu phù hợp",
+            //     "infoFiltered": "(filtered from _MAX_ total records)",
+            //     "lengthMenu": "Hiển thị _MENU_ bản ghi",
+            //     paginate: {
+            //         "first": "",
+            //         "last": "",
+            //         "next": "Tiếp theo",
+            //         "previous": "Trước đó"
+            //     }
+            // }
         });
     });
 </script>
