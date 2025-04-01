@@ -47,10 +47,9 @@ class ClassController extends Controller
                 return [$class->id => $students];
             });
 
+            $teachers = User::where('role_id', 2)->get();
 
-            $teachersNotInClass = User::where('role_id', 2)->get();
-
-            return view('admin.class.index', compact('classes', 'studentsNotInClass', 'teachersNotInClass'));
+            return view('admin.class.index', compact('classes', 'studentsNotInClass', 'teachers'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
         }
@@ -71,7 +70,7 @@ class ClassController extends Controller
             ]);
 
             DB::commit();
-            return redirect()->route('classes.index')->with('success', 'Thêm lớp học thành công');
+            return redirect()->back()->with('success', 'Thêm lớp học thành công');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'Thêm lớp học thất bại: ' . $e->getMessage());
