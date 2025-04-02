@@ -8,13 +8,13 @@
 
         <div class="mt-6">
             <x-inputs.input-label value="{{ __('Code') }}" for="code" />
-            <x-inputs.text-input id="code" class="mt-2 w-full" name="code" type="text" :value="old('code')" autofocus placeholder="{{ __('Class code') }}" />
+            <x-inputs.text id="code" class="mt-2 w-full" name="code" type="text" :value="old('code')" autofocus placeholder="{{ __('Class code') }}" />
             <x-inputs.input-error class="mt-2" :messages="$errors->get('code')" />
         </div>
 
         <div class="mt-6">
             <x-inputs.input-label value="{{ __('Name') }}" for="name" />
-            <x-inputs.text-input id="name" class="mt-2 w-full" name="name" type="text" :value="old('name')" autofocus placeholder="{{ __('Class name') }}" />
+            <x-inputs.text id="name" class="mt-2 w-full" name="name" type="text" :value="old('name')" autofocus placeholder="{{ __('Class name') }}" />
             <x-inputs.input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
@@ -31,7 +31,7 @@
 
         <div class="mt-6">
             <x-inputs.input-label value="{{ __('Description') }}" for="description" />
-            <x-inputs.text-input id="description" class="mt-2 w-full" name="description" type="text" :value="old('description')" autofocus placeholder="{{ __('Class description') }}" />
+            <x-inputs.text id="description" class="mt-2 w-full" name="description" type="text" :value="old('description')" autofocus placeholder="{{ __('Class description') }}" />
             <x-inputs.input-error class="mt-2" :messages="$errors->get('description')" />
         </div>
 
