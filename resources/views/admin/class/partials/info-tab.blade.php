@@ -68,7 +68,7 @@
                             @else
                                 <a class="btn btn-soft btn-success join-item" href="{{ route('admin.class.destroy', $class->id) }}">{{ __('Unlock') }}</a>
                             @endif
-                            <a class="btn btn-soft btn-success join-item">{{ __('Excel Export') }}</a>
+                            <a class="btn btn-soft btn-success join-item" href="{{ route('admin.class.export', $class->id) }}">{{ __('Excel Export') }}</a>
                         </div>
                     </div>
                 </div>
