@@ -10,7 +10,7 @@
         <div>
             <x-inputs.input-label for="password" :value="__('Password')" />
 
-            <x-inputs.text-input id="password" class="mt-1 block w-full" name="password" type="password" required autocomplete="current-password" />
+            <x-inputs.text id="password" class="mt-1 block w-full" name="password" type="password" required autocomplete="current-password" />
 
             <x-inputs.input-error class="mt-2" :messages="$errors->get('password')" />
         </div>

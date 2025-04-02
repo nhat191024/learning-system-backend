@@ -15,19 +15,19 @@
 
         <div>
             <x-inputs.input-label for="update_password_current_password" :value="__('Current Password')" />
-            <x-inputs.text-input id="update_password_current_password" class="mt-1 block w-full" name="current_password" type="password" autocomplete="current-password" />
+            <x-inputs.text id="update_password_current_password" class="mt-1 block w-full" name="current_password" type="password" autocomplete="current-password" />
             <x-inputs.input-error class="mt-2" :messages="$errors->updatePassword->get('current_password')" />
         </div>
 
         <div>
             <x-inputs.input-label for="update_password_password" :value="__('New Password')" />
-            <x-inputs.text-input id="update_password_password" class="mt-1 block w-full" name="password" type="password" autocomplete="new-password" />
+            <x-inputs.text id="update_password_password" class="mt-1 block w-full" name="password" type="password" autocomplete="new-password" />
             <x-inputs.input-error class="mt-2" :messages="$errors->updatePassword->get('password')" />
         </div>
 
         <div>
             <x-inputs.input-label for="update_password_password_confirmation" :value="__('Confirm Password')" />
-            <x-inputs.text-input id="update_password_password_confirmation" class="mt-1 block w-full" name="password_confirmation" type="password" autocomplete="new-password" />
+            <x-inputs.text id="update_password_password_confirmation" class="mt-1 block w-full" name="password_confirmation" type="password" autocomplete="new-password" />
             <x-inputs.input-error class="mt-2" :messages="$errors->updatePassword->get('password_confirmation')" />
         </div>
 

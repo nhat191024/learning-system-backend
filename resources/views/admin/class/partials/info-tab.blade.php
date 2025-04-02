@@ -62,7 +62,7 @@
                     <div>{{ __('Actions') }}</div>
                     <div class="text-xs font-semibold uppercase opacity-60">
                         <div class="join">
-                            <a class="btn btn-soft btn-warning join-item">{{ __('Edit') }}</a>
+                            <button class="btn btn-soft btn-warning join-item" onclick="editClass.showModal()">{{ __('Edit') }}</button>
                             @if ($class->status == 'published')
                                 <a class="btn btn-soft btn-error join-item" href="{{ route('admin.class.destroy', $class->id) }}">{{ __('Lock') }}</a>
                             @else

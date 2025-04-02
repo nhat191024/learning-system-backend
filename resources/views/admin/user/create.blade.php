@@ -13,7 +13,7 @@
                         @csrf
                         <div>
                             <x-inputs.input-label value="{{ __('Name') }}" for="name" />
-                            <x-inputs.text-input id="name" class="mt-2 w-full" name="name" type="text" :value="old('name')" autofocus placeholder="{{ __('Name') }}" />
+                            <x-inputs.text id="name" class="mt-2 w-full" name="name" type="text" :value="old('name')" autofocus placeholder="{{ __('Name') }}" />
                             <x-inputs.input-error class="mt-2" :messages="$errors->get('name')" />
                         </div>
                         <div class="mt-4">
@@ -26,7 +26,7 @@
                         </div>
                         <div class="mt-4">
                             <x-inputs.input-label value="{{ __('Email') }}" for="email" />
-                            <x-inputs.text-input id="email" class="mt-2 w-full" name="email" type="email" :value="old('email')" placeholder="{{ __('Email') }}" />
+                            <x-inputs.text id="email" class="mt-2 w-full" name="email" type="email" :value="old('email')" placeholder="{{ __('Email') }}" />
                             <x-inputs.input-error class="mt-2" :messages="$errors->get('email')" />
                         </div>
                         <div class="mt-4">

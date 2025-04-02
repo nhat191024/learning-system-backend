@@ -1,4 +1,4 @@
-<x-actions.modal class="border border-gray-300 dark:border-gray-700" :id="'createClass'">
+<x-actions.modal class="border border-gray-300 dark:border-gray-700" :id="'editClass'">
     <form action="{{ route('admin.class.update', $class->id) }}" method="POST">
         @csrf
 
@@ -8,13 +8,13 @@
 
         <div class="mt-6">
             <x-inputs.input-label value="{{ __('Code') }}" for="code" />
-            <x-inputs.text-input id="code" class="mt-2 w-full" name="code" type="text" required :value="old('code', $class->code)" autofocus placeholder="{{ __('Class code') }}" />
+            <x-inputs.text id="code" class="mt-2 w-full" name="code" type="text" required :value="old('code', $class->code)" autofocus placeholder="{{ __('Class code') }}" />
             <x-inputs.input-error class="mt-2" :messages="$errors->get('code')" />
         </div>
 
         <div class="mt-6">
             <x-inputs.input-label value="{{ __('Name') }}" for="name" />
-            <x-inputs.text-input id="name" class="mt-2 w-full" name="name" type="text" required :value="old('name', $class->name)" autofocus placeholder="{{ __('Class name') }}" />
+            <x-inputs.text id="name" class="mt-2 w-full" name="name" type="text" required :value="old('name', $class->name)" autofocus placeholder="{{ __('Class name') }}" />
             <x-inputs.input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
@@ -23,7 +23,7 @@
             <div class="mt-1"></div>
             <x-inputs.select-input id="categories" class="select-search-modal mt-2 w-full" name="categories[]" required multiple>
                 @foreach ($categories as $category)
-                    <option value="{{ $category->id }}">{{ $category->name }}</option>
+                    <option value="{{ $category->id }}" {{ in_array($category->id, $class->categories->pluck('id')->toArray()) ? 'selected' : '' }}>{{ $category->name }}</option>
                 @endforeach
             </x-inputs.select-input>
             <x-inputs.input-error class="mt-2" :messages="$errors->get('categories')" />
@@ -31,7 +31,7 @@
 
         <div class="mt-6">
             <x-inputs.input-label value="{{ __('Description') }}" for="description" />
-            <x-inputs.text-input id="description" class="mt-2 w-full" name="description" type="text" required :value="old('description')" autofocus placeholder="{{ __('Class description') }}" />
+            <x-inputs.text id="description" class="mt-2 w-full" name="description" type="text" required :value="old('description', $class->description)" autofocus placeholder="{{ __('Class description') }}" />
             <x-inputs.input-error class="mt-2" :messages="$errors->get('description')" />
         </div>
 
@@ -40,7 +40,7 @@
             <div class="mt-1"></div>
             <x-inputs.select-input id="teacher" class="select-search-modal mt-2 w-full" name="teacher_id" required>
                 @foreach ($teachers as $teacher)
-                    <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
+                    <option value="{{ $teacher->id }}" {{ $teacher->id == $class->teacher_id ? 'select' : '' }}>{{ $teacher->name }}</option>
                 @endforeach
             </x-inputs.select-input>
             <x-inputs.input-error class="mt-2" :messages="$errors->get('teacher_id')" />
