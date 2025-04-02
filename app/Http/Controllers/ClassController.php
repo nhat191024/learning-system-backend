@@ -5,9 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Classes;
 use App\Models\Category;
-use App\Models\Enrollment;
-use App\Models\Certificate;
-use App\Models\ClassAssignment;
 
 use App\Http\Requests\StoreClassRequest;
 use App\Http\Requests\UpdateClassRequest;
@@ -136,37 +133,24 @@ class ClassController extends Controller
         }
     }
 
-    public function assignmentDetailsJson($assignment_id)
-    {
-        $assignment = ClassAssignment::with(['quizzes.choices', 'submits.student'])->findOrFail($assignment_id);
-
-        $questionsHtml = view('partials.assignment_questions', compact('assignment'))->render();
-        $scoresHtml = view('partials.assignment_scores', compact('assignment'))->render();
-        $resultsHtml = '';
-
-        if ($assignment->type === 'lab') {
-            $resultsHtml = view('partials.assignment_results', compact('assignment'))->render();
-        }
-
-        return response()->json([
-            'assignment' => $assignment,
-            'questionsHtml' => $questionsHtml,
-            'scoresHtml' => $scoresHtml,
-            'resultsHtml' => $resultsHtml,
-        ]);
-    }
-
+    /**
+     * Export class details to Excel.
+     */
     public function export($id)
     {
-        $class = Classes::with(['assignments'])->findOrFail($id);
-        $students = $class->students()->where('role_id', 3)->get();
+        $class = Classes::find($id)->load(['categories', 'teacher', 'students']);
+
+        $categories = $class->categories->pluck('name')->implode(', ');
+        $students = $class->students;
 
         $data = [
             ['Thông tin lớp học'],
             ['Tên lớp', $class->name],
             ['Mã lớp', $class->code],
-            ['Trạng thái', $class->status === 'published' ? 'Mở khóa' : 'Khóa'],
+            ['Trạng thái', $class->status === 'published' ? 'Mở khoá' : 'Khoá'],
             ['Giảng viên', $class->teacher->name],
+            ['Danh mục', $categories],
+
             [],
             ['Danh sách học sinh'],
             ['STT', 'Tên học sinh', 'Email'],
@@ -193,61 +177,6 @@ class ClassController extends Controller
             public function array(): array
             {
                 return $this->data;
-            }
-        }, $fileName);
-    }
-
-    public function importConfirm(Request $request, $class_id)
-    {
-        $students = $request->input('students');
-        $successMessages = [];
-        $errorMessages = [];
-
-        foreach ($students as $studentData) {
-            $student = User::where('email', $studentData['email'])->first();
-
-            if ($student && $student->role_id == 3) {
-                // Kiểm tra nếu học sinh đã tồn tại trong lớp học
-                $enrollmentExists = Enrollment::where('class_id', $class_id)
-                    ->where('student_id', $student->id)
-                    ->exists();
-
-                if (!$enrollmentExists) {
-                    Enrollment::firstOrCreate(
-                        ['class_id' => $class_id, 'student_id' => $student->id]
-                    );
-                    $successMessages[] = "Học sinh {$student->name} ({$student->email}) đã được thêm thành công.";
-                } else {
-                    $errorMessages[] = "Học sinh {$student->name} ({$student->email}) đã tồn tại trong lớp.";
-                }
-            } else {
-                $errorMessages[] = "Học sinh với email {$studentData['email']} không tồn tại hoặc không phải là học sinh.";
-            }
-        }
-
-        return response()->json([
-            'success' => true,
-            'successMessages' => $successMessages,
-            'errorMessages' => $errorMessages,
-        ]);
-    }
-
-    public function template()
-    {
-        $headers = ['Tên học sinh', 'Email'];
-        $fileName = 'student_import_template.xlsx';
-
-        return Excel::download(new class([$headers]) implements FromArray {
-            protected $data;
-
-            public function __construct($data)
-            {
-                $this->data = $data;
-            }
-
-            public function array(): array
-            {
-                return [$this->data];
             }
         }, $fileName);
     }
