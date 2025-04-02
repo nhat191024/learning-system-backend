@@ -156,21 +156,6 @@ class ClassController extends Controller
         ]);
     }
 
-    public function toggleClassStatus(Request $request, $id)
-    {
-        $class = Classes::findOrFail($id);
-
-        $newStatus = $request->input('status');
-        if (!in_array($newStatus, ['closed', 'published'])) {
-            return redirect()->back()->with('error', 'Trạng thái không hợp lệ!');
-        }
-
-        $class->update(['status' => $newStatus]);
-
-        $message = $newStatus === 'closed' ? 'Lớp đã được khóa.' : 'Lớp đã được mở khóa.';
-        return redirect()->back()->with('success', $message);
-    }
-
     public function export($id)
     {
         $class = Classes::with(['assignments'])->findOrFail($id);
