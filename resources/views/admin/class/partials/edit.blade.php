@@ -1,6 +1,7 @@
 <x-actions.modal class="border border-gray-300 dark:border-gray-700" :id="'editClass'">
     <form action="{{ route('admin.class.update', $class->id) }}" method="POST">
         @csrf
+        @method('PUT')
 
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
             {{ __('Edit class') }} {{ $class->name }}
