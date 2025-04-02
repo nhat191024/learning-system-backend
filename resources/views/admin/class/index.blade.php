@@ -52,9 +52,9 @@
                                 <td>{{ $class->teacher->name }}</td>
                                 <td>
                                     @if ($class->status == 'published')
-                                        <span class="badge badge-lg badge-success">{{ __('Working') }}</span>
+                                        <span class="badge badge-lg badge-success">{{ $class->status }}</span>
                                     @else
-                                        <span class="badge badge-lg badge-error">{{ __('Stopped') }}</span>
+                                        <span class="badge badge-lg badge-error">{{ $class->status }}</span>
                                     @endif
                                 </td>
                                 <td>{{ $class->created_at->format('H:i d/m/Y ') }}</td>
