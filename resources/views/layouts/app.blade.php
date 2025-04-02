@@ -40,9 +40,9 @@
 
 <!-- datatables center -->
 <style>
-    #datatables th,
-    #datatables td {
-        text-align: center;
+    .datatables th,
+    .datatables td {
+        text-align: center !important;
     }
 </style>
 
