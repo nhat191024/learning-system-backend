@@ -10,6 +10,7 @@ use App\Models\Certificate;
 use App\Models\ClassAssignment;
 
 use App\Http\Requests\StoreClassRequest;
+use App\Http\Requests\UpdateClassRequest;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -53,10 +54,10 @@ class ClassController extends Controller
             }
 
             DB::commit();
-            return redirect()->back()->with('success', 'Thêm lớp học thành công');
+            return redirect()->back()->with('success', 'Class added successfully');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Thêm lớp học thất bại: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to add class: ' . $e->getMessage());
         }
     }
 
@@ -66,7 +67,9 @@ class ClassController extends Controller
     public function detail($id, $assignment_id = null)
     {
         $class = Classes::find($id)->load(['categories', 'teacher', 'students', 'assignments']);
-        return view('admin.class.detail', compact('class'));
+        $teachers = User::where('role_id', 2)->get();
+        $categories = Category::all();
+        return view('admin.class.detail', compact('class', 'teachers', 'categories'));
     }
 
     /**
@@ -78,6 +81,33 @@ class ClassController extends Controller
         $teachers = User::where('role_id', 2)->get();
         $categories = Category::all();
         return view('class.edit', compact('class', 'teachers', 'categories'));
+    }
+
+    /**
+     * Update the specified class in storage.
+     */
+    public function update(UpdateClassRequest $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $class = Classes::findOrFail($id);
+            $class->update([
+                'code' => $request->code,
+                'name' => $request->name,
+                'description' => $request->description,
+                'teacher_id' => $request->teacher_id,
+            ]);
+
+            if ($request->has('categories')) {
+                $class->categories()->sync($request->categories);
+            }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Update class successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Update class failed: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -98,39 +128,12 @@ class ClassController extends Controller
 
             DB::commit();
 
-            $message = $newStatus === 'closed' ? 'Class has been hidden!' : 'Class has been displayed!';
+            $message = $newStatus === 'closed' ? 'Class has been locked!' : 'Class has been displayed!';
             return redirect()->back()->with('success', $message);
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
-    }
-
-    public function updateClass(Request $request, $id)
-    {
-        $request->validate([
-            'code' => 'required|string|max:255|unique:classes,code,' . $id,
-            'name' => 'required|string|max:255|unique:classes,name,' . $id,
-            'description' => 'required|string|max:500',
-            'teacher_id' => 'required|integer|exists:users,id',
-        ], [
-            'code.required' => 'Vui lòng nhập mã lớp!',
-            'code.unique' => 'Mã lớp đã tồn tại, vui lòng chọn mã khác',
-            'name.required' => 'Vui lòng nhập tên lớp!',
-            'name.unique' => 'Lớp học đã tồn tại, vui lòng nhập tên khác',
-            'description.required' => 'Vui lòng nhập mô tả lớp!',
-            'teacher_id.required' => 'Vui lòng chọn giảng viên!',
-            'teacher_id.exists' => 'Giảng viên không tồn tại!',
-        ]);
-
-        $class = Classes::findOrFail($id);
-        $class->update([
-            'code' => $request->code,
-            'name' => $request->name,
-            'description' => $request->description,
-            'teacher_id' => $request->teacher_id,
-        ]);
-        return redirect()->route('classes.index')->with('success', 'Lớp học đã được cập nhật.');
     }
 
     public function assignmentDetailsJson($assignment_id)
