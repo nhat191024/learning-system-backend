@@ -31,7 +31,9 @@
 
         <div class="mt-6">
             <x-inputs.input-label value="{{ __('Description') }}" for="description" />
-            <x-inputs.text id="description" class="mt-2 w-full" name="description" type="text" :value="old('description')" autofocus placeholder="{{ __('Class description') }}" />
+            <x-inputs.area id="description" class="mt-2 w-full" name="description" placeholder="{{ __('Class description') }}">
+                {{ old('description') }}
+            </x-inputs.area>
             <x-inputs.input-error class="mt-2" :messages="$errors->get('description')" />
         </div>
 
