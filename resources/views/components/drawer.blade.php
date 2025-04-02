@@ -1,4 +1,4 @@
-<div class="drawer">
+<div class="drawer z-10">
     <input id="my-drawer" class="drawer-toggle" type="checkbox" />
     <div class="drawer-content">
         <label class="btn btn-ghost btn-circle" for="my-drawer">
