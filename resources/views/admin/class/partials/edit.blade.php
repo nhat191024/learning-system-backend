@@ -51,7 +51,7 @@
 
         <div class="modal-action">
             <x-buttons.success class="ms-3">
-                {{ __('Xác nhận') }}
+                {{ __('Submit') }}
             </x-buttons.success>
         </div>
     </form>
