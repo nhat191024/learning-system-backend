@@ -131,9 +131,7 @@
     @endif
 
     @if ($errors->any())
-        @foreach ($errors->all() as $error)
-            showToast("{{ $error }}", 'error');
-        @endforeach
+        showToast("Error! something when wrong. Please try again!", 'error');
     @endif
 </script>
 
