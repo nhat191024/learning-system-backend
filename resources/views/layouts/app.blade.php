@@ -88,7 +88,7 @@
 
         // Thêm classes animation
         alert.className =
-            `alert ${type === 'success' ? 'alert-success' : 'alert-error'} shadow-lg transform translate-x-full opacity-0 transition-all duration-300 ease-in-out`;
+            `alert ${type === 'success' ? 'alert-success' : 'alert-error'} shadow-lg transform translate-x-full opacity-0 transition-all duration-300 ease-in-out flex justify-between items-center`;
 
         alert.innerHTML = `
                 <div>
@@ -128,6 +128,12 @@
 
     @if (session('error'))
         showToast("{{ session('error') }}", 'error');
+    @endif
+
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            showToast("{{ $error }}", 'error');
+        @endforeach
     @endif
 </script>
 
