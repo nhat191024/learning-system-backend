@@ -1,4 +1,4 @@
-<table id="datatables" class="stripe hover">
+<table class="datatables stripe hover">
     <thead>
         <tr>
             {{ $header }}
