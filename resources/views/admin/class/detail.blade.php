@@ -8,7 +8,6 @@
     <div class="py-12">
 
         @include('admin.class.partials.edit')
-        @include('admin.class.partials.import')
 
         <div class="mx-auto max-w-full sm:px-6 lg:px-8">
             <div class="tabs" role="tablist">
