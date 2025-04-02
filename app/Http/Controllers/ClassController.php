@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Classes;
+use App\Models\Category;
 use App\Models\Enrollment;
 use App\Models\Certificate;
 use App\Models\ClassAssignment;
@@ -26,7 +27,8 @@ class ClassController extends Controller
         try {
             $classes = Classes::with('categories', 'teacher')->get();
             $teachers = User::where('role_id', 2)->get();
-            return view('admin.class.index', compact('classes', 'teachers'));
+            $categories = Category::all();
+            return view('admin.class.index', compact('classes', 'teachers', 'categories'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
         }
@@ -39,12 +41,16 @@ class ClassController extends Controller
     {
         DB::beginTransaction();
         try {
-            Classes::create([
+            $class = Classes::create([
                 'code' => $request->code,
                 'name' => $request->name,
                 'description' => $request->description,
                 'teacher_id' => $request->teacher_id,
             ]);
+
+            foreach ($request->categories as $categoryId) {
+                $class->categories()->attach($categoryId);
+            }
 
             DB::commit();
             return redirect()->back()->with('success', 'Thêm lớp học thành công');
@@ -59,17 +65,8 @@ class ClassController extends Controller
      */
     public function detail($id, $assignment_id = null)
     {
-        $class_id = $id;
-        $class = Classes::with(['assignments.quizzes.choices'])->findOrFail($id);
-        $certificates = Certificate::all();
-        $studentsNotInClass = User::where('role_id', 3)
-            ->whereDoesntHave('enrollments', function ($query) use ($class) {
-                $query->where('class_id', $class->id);
-            })
-            ->get();
-
-        $assignment = $assignment_id ? ClassAssignment::with('quizzes.choices')->findOrFail($assignment_id) : null;
-        return view('class.show', compact('class', 'class_id', 'studentsNotInClass', 'assignment', 'certificates'));
+        $class = Classes::find($id)->load(['categories', 'teacher', 'students', 'assignments']);
+        return view('admin.class.detail', compact('class'));
     }
 
     /**
@@ -102,7 +99,8 @@ class ClassController extends Controller
     {
         $class = Classes::findOrFail($id);
         $teachers = User::where('role_id', 2)->get();
-        return view('class.edit', compact('class', 'teachers'));
+        $categories = Category::all();
+        return view('class.edit', compact('class', 'teachers', 'categories'));
     }
 
     public function updateClass(Request $request, $id)
