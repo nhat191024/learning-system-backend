@@ -11,10 +11,5 @@ Route::prefix('class')->name('class.')->group(function () {
     Route::get('/edit/{id}', [ClassController::class, 'edit'])->name('edit');
     Route::put('/update/{id}', [ClassController::class, 'update'])->name('update');
     Route::get('/destroy/{id}', [ClassController::class, 'destroy'])->name('destroy');
-
-    // Route::get('/{id}/assignment/{assignment_id}', [ClassController::class, 'show'])->name('assignmentDetails');
-    // Route::get('/assignment/{assignment_id}/details', [ClassController::class, 'assignmentDetailsJson'])->name('assignmentDetailsJson');
-    // Route::post('/{id}/toggle-status', [ClassController::class, 'toggleClassStatus'])->name('toggleStatus');
-    // Route::get('/{id}/export', [ClassController::class, 'export'])->name('export');
-    // Route::post('/{class}/import-confirm', [ClassController::class, 'importConfirm'])->name('importConfirm');
+    Route::get('/export/{id}', [ClassController::class, 'export'])->name('export');
 });
