@@ -188,7 +188,7 @@
 <!-- datatables initialization -->
 <script>
     $(document).ready(function() {
-        $('#datatables').DataTable({
+        $('.datatables').DataTable({
             {{-- * uncomment when website using other language --}}
             // language: {
             //     "entries per page": "số bản ghi mỗi trang",
