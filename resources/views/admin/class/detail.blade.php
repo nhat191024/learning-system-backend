@@ -6,6 +6,9 @@
         <a class="btn btn-soft btn-info" href="{{ route('admin.class.index') }}">{{ __('Back') }}</a>
     </x-slot>
     <div class="py-12">
+
+        @include('admin.class.partials.edit')
+
         <div class="mx-auto max-w-full sm:px-6 lg:px-8">
             <div class="tabs" role="tablist">
                 <a class="tab tab-active" data-tab="tab1" role="tab">{{ __('Info') }}</a>
