@@ -70,6 +70,17 @@ class ClassController extends Controller
     }
 
     /**
+     * Show the form for editing the specified class.
+     */
+    public function edit($id)
+    {
+        $class = Classes::findOrFail($id);
+        $teachers = User::where('role_id', 2)->get();
+        $categories = Category::all();
+        return view('class.edit', compact('class', 'teachers', 'categories'));
+    }
+
+    /**
      * Destroy the specified class.
      */
     public function destroy($id)
@@ -93,14 +104,6 @@ class ClassController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', 'An error occurred: ' . $e->getMessage());
         }
-    }
-
-    public function edit($id)
-    {
-        $class = Classes::findOrFail($id);
-        $teachers = User::where('role_id', 2)->get();
-        $categories = Category::all();
-        return view('class.edit', compact('class', 'teachers', 'categories'));
     }
 
     public function updateClass(Request $request, $id)
