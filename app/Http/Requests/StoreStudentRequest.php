@@ -20,8 +20,8 @@ class StoreStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'student_id' => 'required|exists:users,id',
-            'class_id' => 'required|exists:classes,id',
+            'students' => 'required|array',
+            'students*' => 'required|exists:users,id',
         ];
     }
 
@@ -31,10 +31,10 @@ class StoreStudentRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'student_id.required' => 'Vui lòng chọn học sinh!',
-            'student_id.exists' => 'Học sinh không tồn tại!',
-            'class_id.required' => 'Vui lòng chọn lớp học!',
-            'class_id.exists' => 'Lớp học không tồn tại!',
+            'students.required' => 'Vui lòng chọn ít nhất một học sinh.',
+            'students.array' => 'Dữ liệu không hợp lệ.',
+            'students*.required' => 'Học sinh không được để trống.',
+            'students*.exists' => 'Học sinh không tồn tại trong hệ thống.',
         ];
     }
 }
