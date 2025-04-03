@@ -3,11 +3,15 @@
         <h2 id="header-info" class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
             {{ __('Class management - Info') }}
         </h2>
-        <a class="btn btn-soft btn-info" href="{{ route('admin.class.index') }}">{{ __('Back') }}</a>
+        <div class="join">
+            <button class="btn btn-soft btn-accent join-item" onclick="addStudent.showModal()">{{ __('Add student') }}</button>
+            <a class="btn btn-soft btn-info join-item" href="{{ route('admin.class.index') }}">{{ __('Back') }}</a>
+        </div>
     </x-slot>
     <div class="py-12">
 
         @include('admin.class.partials.edit')
+        @include('admin.class.partials.add-student')
 
         <div class="mx-auto max-w-full sm:px-6 lg:px-8">
             <div class="tabs" role="tablist">
