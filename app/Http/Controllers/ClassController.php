@@ -67,7 +67,7 @@ class ClassController extends Controller
      */
     public function detail($id, $assignment_id = null)
     {
-        $class = Classes::with(['categories', 'teacher', 'students', 'assignments'])->findOrFail($id);
+        $class = Classes::with(['categories', 'teacher', 'students.certificates', 'assignments'])->findOrFail($id);
         $teachers = cache()->remember('teachers', now()->addMinutes(10), function () {
             return User::where('role_id', 2)->get();
         });
