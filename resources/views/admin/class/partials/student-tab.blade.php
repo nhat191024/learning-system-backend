@@ -23,8 +23,8 @@
                     <td>{{ $student->gender }}</td>
                     <td>{{ $student->email }}</td>
                     <td>
-                        @if ($student->certificate)
-                            <a class="badge badge-lg badge-info" href="{{ asset($student->certificate) }}" target="_blank">{{ __('View') }}</a>
+                        @if ($student->certificates->count() > 0)
+                            <span class="badge badge-lg badge-success">{{ __('Certificated') }}</span>
                         @else
                             <span class="badge badge-lg badge-error">{{ __('No certificate') }}</span>
                         @endif
@@ -39,8 +39,8 @@
                     <td>{{ $student->created_at->format('H:i d/m/Y ') }}</td>
                     <td>
                         <div class="join">
-                            <a class="btn btn-soft btn-success join-item">{{ __('Certification') }}</a>
-                            <a class="btn btn-soft btn-error join-item">{{ __('Remove') }}</a>
+                            <a class="btn btn-soft btn-success join-item" href="{{ route('admin.student.certificate', ['class_id' => $class->id, 'student_id' => $student->id]) }}">{{ __('Certification') }}</a>
+                            <a class="btn btn-soft btn-error join-item" href="{{ route('admin.student.destroy', ['class_id' => $class->id, 'student_id' => $student->id]) }}">{{ __('Remove') }}</a>
                         </div>
                     </td>
                 </tr>
