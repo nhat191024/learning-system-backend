@@ -24,8 +24,12 @@ class ClassController extends Controller
     {
         try {
             $classes = Classes::with('categories', 'teacher')->get();
-            $teachers = User::where('role_id', 2)->get();
-            $categories = Category::all();
+            $teachers = cache()->remember('teachers', now()->addMinutes(10), function () {
+                return User::where('role_id', 2)->get();
+            });
+            $categories = cache()->remember('categories', now()->addMinutes(10), function () {
+                return Category::all();
+            });
             return view('admin.class.index', compact('classes', 'teachers', 'categories'));
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
@@ -63,10 +67,20 @@ class ClassController extends Controller
      */
     public function detail($id, $assignment_id = null)
     {
-        $class = Classes::find($id)->load(['categories', 'teacher', 'students', 'assignments']);
-        $teachers = User::where('role_id', 2)->get();
-        $categories = Category::all();
-        return view('admin.class.detail', compact('class', 'teachers', 'categories'));
+        $class = Classes::with(['categories', 'teacher', 'students', 'assignments'])->findOrFail($id);
+        $teachers = cache()->remember('teachers', now()->addMinutes(10), function () {
+            return User::where('role_id', 2)->get();
+        });
+        $categories = cache()->remember('categories', now()->addMinutes(10), function () {
+            return Category::all();
+        });
+        $students = User::where('role_id', 3)
+            ->whereDoesntHave('enrollments', function ($query) use ($class) {
+                $query->where('class_id', $class->id);
+            })
+            ->get();
+
+        return view('admin.class.detail', compact('class', 'teachers', 'categories', 'students'));
     }
 
     /**
