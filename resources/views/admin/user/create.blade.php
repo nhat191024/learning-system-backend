@@ -47,9 +47,9 @@
                             <x-inputs.input-error class="mt-2" :messages="$errors->get('status')" />
                         </div>
                         <div class="mt-6">
-                            <x-buttons.primary-button type="submit">
+                            <x-buttons.primary type="submit">
                                 {{ __('Save') }}
-                            </x-buttons.primary-button>
+                            </x-buttons.primary>
                         </div>
                     </form>
                 </div>
