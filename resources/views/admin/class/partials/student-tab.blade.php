@@ -39,7 +39,11 @@
                     <td>{{ $student->created_at->format('H:i d/m/Y ') }}</td>
                     <td>
                         <div class="join">
-                            <a class="btn btn-soft btn-success join-item" href="{{ route('admin.student.certificate', ['class_id' => $class->id, 'student_id' => $student->id]) }}">{{ __('Certification') }}</a>
+                            @if ($student->certificates->count() > 0)
+                                <a class="btn btn-soft btn-warning join-item" href="{{ route('admin.student.destroyCertificate', ['class_id' => $class->id, 'student_id' => $student->id]) }}">{{ __('Remove Certification') }}</a>
+                            @else
+                                <a class="btn btn-soft btn-success join-item" href="{{ route('admin.student.certificate', ['class_id' => $class->id, 'student_id' => $student->id]) }}">{{ __('Certification') }}</a>
+                            @endif
                             <a class="btn btn-soft btn-error join-item" href="{{ route('admin.student.destroy', ['class_id' => $class->id, 'student_id' => $student->id]) }}">{{ __('Remove') }}</a>
                         </div>
                     </td>
