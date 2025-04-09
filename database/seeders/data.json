@@ -1681,5 +1681,52 @@
             "student_id": 9,
             "class_id": 3
         }
+    ],
+    "course": [
+        {
+            "code": "java-basic",
+            "name": "java cơ bản",
+            "description": "Lớp học về lập trình java cơ bản",
+            "status": "published",
+            "categories": [
+                {
+                    "category_id": 1
+                },
+                {
+                    "category_id": 6
+                },
+                {
+                    "category_id": 17
+                }
+            ],
+            "assignments": [
+                {
+                    "video_url": "https://www.youtube.com/watch?v=abc123",
+                    "title": "Video Java cơ bản",
+                    "description": "Video hướng dẫn lập trình java cơ bản",
+                    "duration": null,
+                    "quiz": [
+                        {
+                            "quiz_id": 53
+                        },
+                        {
+                            "quiz_id": 50
+                        },
+                        {
+                            "quiz_id": 60
+                        },
+                        {
+                            "quiz_id": 64
+                        },
+                        {
+                            "quiz_id": 59
+                        },
+                        {
+                            "quiz_id": 56
+                        }
+                    ]
+                }
+            ]
+        }
     ]
 }

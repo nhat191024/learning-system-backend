@@ -13,6 +13,10 @@ use App\Models\Classes;
 use App\Models\ClassCategory;
 use App\Models\ClassAssignment;
 use App\Models\AssignmentQuiz;
+use App\Models\Course;
+use App\Models\CourseAssignment;
+use App\Models\CourseCategory;
+use App\Models\CourseQuiz;
 use App\Models\Enrollment;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -115,6 +119,39 @@ class DatabaseSeeder extends Seeder
                 'class_id' => $row['class_id'],
                 'student_id' => $row['student_id'],
             ]);
+        }
+
+        foreach ($data['course'] as $row) {
+            $course = Course::create([
+                'code' => $row['code'],
+                'name' => $row['name'],
+                'description' => $row['description'],
+                'status' => $row['status'],
+            ]);
+
+            foreach ($row['categories'] as $category) {
+                CourseCategory::create([
+                    'course_id' => $course->id,
+                    'category_id' => $category['category_id'],
+                ]);
+            }
+
+            foreach ($row['assignments'] as $assignment) {
+                $quizAssignment = CourseAssignment::create([
+                    'course_id' => $course->id,
+                    'video_url' => $assignment['video_url'],
+                    'title' => $assignment['title'],
+                    'description' => $assignment['description'],
+                    'duration' => $assignment['duration']
+                ]);
+
+                foreach ($assignment['quiz'] as $quiz) {
+                    CourseQuiz::create([
+                        'course_assignment_id' => $quizAssignment->id,
+                        'quiz_id' => $quiz['quiz_id'],
+                    ]);
+                }
+            }
         }
     }
 }
