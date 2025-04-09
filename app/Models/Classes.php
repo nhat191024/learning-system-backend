@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Classes extends Model
 {
     protected $fillable = [
-        'code',  
+        'code',
         'name',
         'teacher_id',
         'description',
@@ -38,7 +38,7 @@ class Classes extends Model
 
     public function enrollments()
     {
-        return $this->hasMany(Enrollment::class);
+        return $this->hasMany(Enrollment::class, 'class_id');
     }
 
     public function notifications()
