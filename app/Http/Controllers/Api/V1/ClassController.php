@@ -16,9 +16,31 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ClassController extends Controller
 {
-    public function index()
+    public function index($all)
     {
+        if ($all == '1') {
+            $classes = Classes::with('teacher', 'categories', 'enrollments')->where('status', "published")->get();
+
+            $classes = $classes->map(function ($class) {
+                return [
+                    'id' => $class->id,
+                    'name' => $class->name,
+                    'description' => $class->description,
+                    'teacherName' => $class->teacher ? $class->teacher->name : 'Chưa có giáo viên',
+                    'categories' => $class->categories->map(function ($category) {
+                        return $category->name;
+                    }),
+                    'joined' => $class->enrollments->contains('student_id', Auth::id()) ? true : false,
+                    'createdAt' => $class->created_at,
+                ];
+            });
+
+            return response()->json([
+                'classes' => $classes,
+            ], Response::HTTP_OK);
+        }
         $user = Auth::user();
+
         if ($user->role_id == 3) {
             $enrolledClassIds = $user->enrollments->pluck('class_id')->toArray();
             $classes = Classes::with('teacher', 'categories')
