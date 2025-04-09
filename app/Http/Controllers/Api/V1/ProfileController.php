@@ -14,7 +14,19 @@ class ProfileController extends Controller
     public function showProfile()
     {
         $user = Auth::user();
-        return response()->json(['data' => $user], Response::HTTP_OK);
+        $user->load('role');
+        $data = [
+            'id' => $user->id,
+            'email' => $user->email,
+            'avatar' => $user->avatar,
+            'name' => $user->name,
+            'gender' => $user->gender,
+            'role' => $user->role->name,
+            'status' => $user->status == 1 ? 'active' : 'inactive',
+            'createdAt' => $user->created_at->format('H:i:s d/m/Y'),
+            'updatedAt' => $user->updated_at->format('H:i:s d/m/Y'),
+        ];
+        return response()->json(['data' => $data], Response::HTTP_OK);
     }
 
     public function updateProfile(Request $request)
