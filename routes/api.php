@@ -20,7 +20,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 //both teacher and student routes
 Route::middleware(['auth:sanctum', 'ability:teacher,student'])->group(function () {
-    Route::get('classes/', [ClassController::class, 'index']);
+    Route::get('classes/{all}', [ClassController::class, 'index']);
     Route::get('classes/info/{id}', [ClassController::class, 'getClassById']);
 
     Route::get('assignment/getByClass/{class_id}/{role}', [AssignmentController::class, 'GetAssignmentByClassId']);
