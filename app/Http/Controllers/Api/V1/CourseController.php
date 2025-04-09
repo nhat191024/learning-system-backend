@@ -14,7 +14,7 @@ class CourseController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $courses = Course::with('categories')->where('status', "published")->get();
+        $courses = Course::with('categories', 'enrollments')->where('status', "published")->get();
 
         $courses = $courses->map(function ($course) {
             return [
@@ -25,6 +25,7 @@ class CourseController extends Controller
                 'categories' => $course->categories->map(function ($category) {
                     return $category->name;
                 }),
+                'joined' => $course->enrollments->contains('student_id', Auth::id()) ? true : false,
                 'createdAt' => $course->created_at,
             ];
         });
