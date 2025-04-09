@@ -20,6 +20,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 //both teacher and student routes
 Route::middleware(['auth:sanctum', 'ability:teacher,student'])->group(function () {
+    Route::get('profile', [ProfileController::class, 'showProfile']);
+    Route::post('profile/update', [ProfileController::class, 'updateProfile']);
+
     Route::get('classes/{all}', [ClassController::class, 'index']);
     Route::get('classes/info/{id}', [ClassController::class, 'getClassById']);
 
