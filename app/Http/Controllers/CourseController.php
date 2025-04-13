@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CourseAssignment;
+use App\Models\User;
 use App\Models\Course;
 use App\Models\CourseQuiz;
 use App\Models\QuizPackage;
+use App\Models\CourseAssignment;
+
 use Illuminate\Http\Request;
-use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Concerns\FromArray;
-use App\Models\Enrollment;
+
 use Maatwebsite\Excel\Facades\Excel;
+use Maatwebsite\Excel\Concerns\FromArray;
 
 class CourseController extends Controller
 {
@@ -266,12 +267,12 @@ class CourseController extends Controller
 
     public function downloadTemplate()
     {
-        $headers = [ 'Tên học sinh', 'Email'];
+        $headers = ['Tên học sinh', 'Email'];
 
         $data = [
-            [ 'Tên học sinh 1', 'email1@example.com'],
-            [ 'Tên học sinh 2', 'email2@example.com'],
-            [ 'Tên học sinh 3', 'email3@example.com'],
+            ['Tên học sinh 1', 'email1@example.com'],
+            ['Tên học sinh 2', 'email2@example.com'],
+            ['Tên học sinh 3', 'email3@example.com'],
         ];
 
         $dataWithHeaders = array_merge([$headers], $data);
