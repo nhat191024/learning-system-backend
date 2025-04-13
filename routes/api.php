@@ -12,9 +12,14 @@ use App\Http\Controllers\Api\V1\CourseController;
 // Public routes
 Route::post('/login', [LoginController::class, 'login']);
 
+//test route return all users
+Route::get('/test', function () {
+    return response()->json(['users' => \App\Models\User::all()], 200);
+});
+
 //no role required routes
 Route::middleware(['auth:sanctum'])->group(function () {
-    Route::get('/token-check', [LoginController::class, 'tokenCheck']);
+    Route::get('/token', [LoginController::class, 'tokenCheck']);
     Route::get('/logout', [LoginController::class, 'logout']);
 });
 
@@ -28,6 +33,8 @@ Route::middleware(['auth:sanctum', 'ability:teacher,student'])->group(function (
 
     Route::get('assignment/getByClass/{class_id}/{role}', [AssignmentController::class, 'GetAssignmentByClassId']);
     Route::get('assignment/getById/{id}/{isTeacher}', [AssignmentController::class, 'getAssignmentById']);
+
+    Route::get('notification/{class_id}', [ClassNotificationController::class, 'getClassById']);
 });
 
 // Teacher routes
