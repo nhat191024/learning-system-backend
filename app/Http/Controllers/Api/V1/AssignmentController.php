@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Validator;
+
 use Symfony\Component\HttpFoundation\Response;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 //model
 use App\Models\ClassAssignment;
@@ -36,10 +39,11 @@ class AssignmentController extends Controller
                 'title' => $homework->title,
                 'description' => $homework->description,
                 'duration' => $homework->duration ? $homework->duration : "Không có",
-                'startDate' => $homework->start_date,
-                'dueDate' => $homework->due_date,
+                'startDate' => Carbon::parse($homework->start_date)->format('H:i:s j M Y'),
+                'dueDate' => Carbon::parse($homework->due_date)->format('H:i j M Y'),
                 'status' => $homework->status,
                 'isSubmitted' => $answers->count() >= 1 ? true : false,
+                'isDue' => Carbon::now()->greaterThan(Carbon::parse($homework->due_date)),
             ];
         });
 
