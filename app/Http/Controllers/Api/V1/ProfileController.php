@@ -18,7 +18,7 @@ class ProfileController extends Controller
         $data = [
             'id' => $user->id,
             'email' => $user->email,
-            'avatar' => $user->avatar,
+            'avatar' => asset($user->avatar),
             'name' => $user->name,
             'gender' => $user->gender,
             'role' => $user->role->name,
@@ -26,7 +26,7 @@ class ProfileController extends Controller
             'createdAt' => $user->created_at->format('H:i:s d/m/Y'),
             'updatedAt' => $user->updated_at->format('H:i:s d/m/Y'),
         ];
-        return response()->json(['data' => $data], Response::HTTP_OK);
+        return response()->json(['user' => $data], Response::HTTP_OK);
     }
 
     public function updateProfile(Request $request)
