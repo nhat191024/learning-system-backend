@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Http\Controllers\Controller;
+
 use App\Models\Classes;
 use App\Models\Enrollment;
-use App\Models\Submission;
-
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Models\ClassAssignment;
-use App\Models\ClassSubmit;
-use Fruitcake\Cors\CorsService;
+
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+
 use Symfony\Component\HttpFoundation\Response;
 
 class ClassController extends Controller
@@ -90,7 +89,7 @@ class ClassController extends Controller
             'name' => $class->name,
             'description' => $class->description,
             'teacherName' => $class->teacher ? $class->teacher->name : 'Chưa có giáo viên',
-            'createdAt' => $class->created_at
+            'createdAt' => $class->created_at->format('H:i:s d/m/Y'),
         ], Response::HTTP_OK);
     }
 
@@ -205,7 +204,7 @@ class ClassController extends Controller
             return [
                 'title' => $assignment->title,
                 'type' => $assignment->type,
-                'due_date' => $assignment->due_date,
+                'dueDate' => Carbon::parse($assignment->due_date)->format('H:i j M Y'),
                 'score' => $assignment->submits->where('student_id', Auth::id())->first()->score ?? 0,
                 'total_score' => $assignment->type == 'quiz' ? $assignment->quizzes->count() : 0,
                 'handed_in' => $assignment->submits->where('student_id', Auth::id())->first() ? true : false,
