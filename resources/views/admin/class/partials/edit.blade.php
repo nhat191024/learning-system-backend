@@ -8,19 +8,19 @@
         </h2>
 
         <div class="mt-6">
-            <x-inputs.input-label value="{{ __('Code') }}" for="code" />
+            <x-inputs.label value="{{ __('Code') }}" for="code" />
             <x-inputs.text id="code" class="mt-2 w-full" name="code" type="text" required :value="old('code', $class->code)" autofocus placeholder="{{ __('Class code') }}" />
             <x-inputs.input-error class="mt-2" :messages="$errors->get('code')" />
         </div>
 
         <div class="mt-6">
-            <x-inputs.input-label value="{{ __('Name') }}" for="name" />
+            <x-inputs.label value="{{ __('Name') }}" for="name" />
             <x-inputs.text id="name" class="mt-2 w-full" name="name" type="text" required :value="old('name', $class->name)" autofocus placeholder="{{ __('Class name') }}" />
             <x-inputs.input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         <div class="mt-6">
-            <x-inputs.input-label value="{{ __('Categories') }}" for="categories" />
+            <x-inputs.label value="{{ __('Categories') }}" for="categories" />
             <div class="mt-1"></div>
             <x-inputs.select-input id="categories" class="select-search-modal mt-2 w-full" name="categories[]" required multiple>
                 @foreach ($categories as $category)
@@ -31,7 +31,7 @@
         </div>
 
         <div class="mt-6">
-            <x-inputs.input-label value="{{ __('Description') }}" for="description" />
+            <x-inputs.label value="{{ __('Description') }}" for="description" />
             <x-inputs.area id="description" class="mt-2 w-full" name="description" placeholder="{{ __('Class description') }}">
                 {{ old('description', $class->description) }}
             </x-inputs.area>
@@ -39,7 +39,7 @@
         </div>
 
         <div class="mt-6">
-            <x-inputs.input-label value="{{ __('Teacher') }}" for="teacher" />
+            <x-inputs.label value="{{ __('Teacher') }}" for="teacher" />
             <div class="mt-1"></div>
             <x-inputs.select-input id="teacher" class="select-search-modal mt-2 w-full" name="teacher_id" required>
                 @foreach ($teachers as $teacher)

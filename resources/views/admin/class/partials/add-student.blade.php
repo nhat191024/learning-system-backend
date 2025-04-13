@@ -7,7 +7,7 @@
         </h2>
 
         <div class="mt-6">
-            <x-inputs.input-label value="{{ __('Student') }}" for="student" />
+            <x-inputs.label value="{{ __('Student') }}" for="student" />
             <div class="mt-1"></div>
             <x-inputs.select-input id="student" class="select-search-modal mt-2 w-full" name="students[]" multiple>
                 @foreach ($students as $student)

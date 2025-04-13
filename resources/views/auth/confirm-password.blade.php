@@ -8,7 +8,7 @@
 
         <!-- Password -->
         <div>
-            <x-inputs.input-label for="password" :value="__('Password')" />
+            <x-inputs.label for="password" :value="__('Password')" />
 
             <x-inputs.text id="password" class="mt-1 block w-full" name="password" type="password" required autocomplete="current-password" />
 

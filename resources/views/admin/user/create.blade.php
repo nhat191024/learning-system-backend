@@ -12,12 +12,12 @@
                     <form action="{{ route('admin.users.store') }}" method="post">
                         @csrf
                         <div>
-                            <x-inputs.input-label value="{{ __('Name') }}" for="name" />
+                            <x-inputs.label value="{{ __('Name') }}" for="name" />
                             <x-inputs.text id="name" class="mt-2 w-full" name="name" type="text" :value="old('name')" autofocus placeholder="{{ __('Name') }}" />
                             <x-inputs.input-error class="mt-2" :messages="$errors->get('name')" />
                         </div>
                         <div class="mt-4">
-                            <x-inputs.input-label value="{{ __('Gender') }}" for="gender" />
+                            <x-inputs.label value="{{ __('Gender') }}" for="gender" />
                             <x-inputs.select-input id="gender" class="mt-2 w-full" name="gender">
                                 <option value="male">{{ __('Male') }}</option>
                                 <option value="female">{{ __('Female') }}</option>
@@ -25,12 +25,12 @@
                             <x-inputs.input-error class="mt-2" :messages="$errors->get('gender')" />
                         </div>
                         <div class="mt-4">
-                            <x-inputs.input-label value="{{ __('Email') }}" for="email" />
+                            <x-inputs.label value="{{ __('Email') }}" for="email" />
                             <x-inputs.text id="email" class="mt-2 w-full" name="email" type="email" :value="old('email')" placeholder="{{ __('Email') }}" />
                             <x-inputs.input-error class="mt-2" :messages="$errors->get('email')" />
                         </div>
                         <div class="mt-4">
-                            <x-inputs.input-label value="{{ __('Role') }}" for="role_id" />
+                            <x-inputs.label value="{{ __('Role') }}" for="role_id" />
                             <x-inputs.select-input id="role_id" class="mt-2 w-full" name="role_id">
                                 @foreach ($roles as $role)
                                     <option value="{{ $role->id }}">{{ $role->name }}</option>
@@ -39,7 +39,7 @@
                             <x-inputs.input-error class="mt-2" :messages="$errors->get('role_id')" />
                         </div>
                         <div class="mt-4">
-                            <x-inputs.input-label value="{{ __('Status') }}" for="status" />
+                            <x-inputs.label value="{{ __('Status') }}" for="status" />
                             <x-inputs.select-input id="status" class="mt-2 w-full" name="status">
                                 <option value="1">{{ __('Active') }}</option>
                                 <option value="0">{{ __('Deactivate') }}</option>
