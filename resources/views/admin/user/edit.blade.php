@@ -15,7 +15,7 @@
                         <div>
                             <x-inputs.label value="{{ __('Name') }}" for="name" />
                             <x-inputs.text id="name" class="mt-2 w-full" name="name" type="text" :value="old('name', $user->name)" autofocus placeholder="{{ __('Name') }}" />
-                            <x-inputs.input-error class="mt-2" :messages="$errors->get('name')" />
+                            <x-inputs.error class="mt-2" :messages="$errors->get('name')" />
                         </div>
                         <div class="mt-4">
                             <x-inputs.label value="{{ __('Gender') }}" for="gender" />
@@ -23,12 +23,12 @@
                                 <option value="male" {{ old('gender', $user->gender) == 'male' ? 'selected' : '' }}>{{ __('Male') }}</option>
                                 <option value="female" {{ old('gender', $user->gender) == 'female' ? 'selected' : '' }}>{{ __('Female') }}</option>
                             </x-inputs.select-input>
-                            <x-inputs.input-error class="mt-2" :messages="$errors->get('gender')" />
+                            <x-inputs.error class="mt-2" :messages="$errors->get('gender')" />
                         </div>
                         <div class="mt-4">
                             <x-inputs.label value="{{ __('Email') }}" for="email" />
                             <x-inputs.text id="email" class="mt-2 w-full" name="email" type="email" :value="old('email', $user->email)" placeholder="{{ __('Email') }}" />
-                            <x-inputs.input-error class="mt-2" :messages="$errors->get('email')" />
+                            <x-inputs.error class="mt-2" :messages="$errors->get('email')" />
                         </div>
                         <div class="mt-4">
                             <x-inputs.label value="{{ __('Role') }}" for="role_id" />
@@ -39,7 +39,7 @@
                                     </option>
                                 @endforeach
                             </x-inputs.select-input>
-                            <x-inputs.input-error class="mt-2" :messages="$errors->get('role_id')" />
+                            <x-inputs.error class="mt-2" :messages="$errors->get('role_id')" />
                         </div>
                         <div class="mt-4">
                             <x-inputs.label value="{{ __('Status') }}" for="status" />
@@ -47,7 +47,7 @@
                                 <option value="1" {{ old('status', $user->status) == '1' ? 'selected' : '' }}>{{ __('Active') }}</option>
                                 <option value="0" {{ old('status', $user->status) == '0' ? 'selected' : '' }}>{{ __('Deactivate') }}</option>
                             </x-inputs.select-input>
-                            <x-inputs.input-error class="mt-2" :messages="$errors->get('status')" />
+                            <x-inputs.error class="mt-2" :messages="$errors->get('status')" />
                         </div>
                         <div class="mt-6">
                             <x-buttons.primary type="submit">

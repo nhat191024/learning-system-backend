@@ -13,7 +13,7 @@
         <div>
             <x-inputs.label for="email" :value="__('Email')" />
             <x-inputs.text id="email" class="mt-1 block w-full" name="email" type="email" required :value="old('email')" autofocus />
-            <x-inputs.input-error class="mt-2" :messages="$errors->get('email')" />
+            <x-inputs.error class="mt-2" :messages="$errors->get('email')" />
         </div>
 
         <div class="mt-4 flex items-center justify-end">

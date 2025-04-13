@@ -9,7 +9,7 @@
         <div>
             <x-inputs.label for="email" :value="__('Email')" />
             <x-inputs.text id="email" class="mt-1 block w-full" name="email" type="email" required :value="old('email')" autofocus autocomplete="username" />
-            <x-inputs.input-error class="mt-2" :messages="$errors->get('email')" />
+            <x-inputs.error class="mt-2" :messages="$errors->get('email')" />
         </div>
 
         <!-- Password -->
@@ -18,7 +18,7 @@
 
             <x-inputs.text id="password" class="mt-1 block w-full" name="password" type="password" required autocomplete="current-password" />
 
-            <x-inputs.input-error class="mt-2" :messages="$errors->get('password')" />
+            <x-inputs.error class="mt-2" :messages="$errors->get('password')" />
         </div>
 
         <!-- Remember Me -->

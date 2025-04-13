@@ -14,7 +14,7 @@
                     <option value="{{ $student->id }}">{{ $student->name }}</option>
                 @endforeach
             </x-inputs.select-input>
-            <x-inputs.input-error class="mt-2" :messages="$errors->get('student')" />
+            <x-inputs.error class="mt-2" :messages="$errors->get('student')" />
         </div>
 
         <div class="modal-action">

@@ -9,13 +9,13 @@
         <div class="mt-6">
             <x-inputs.label value="{{ __('Code') }}" for="code" />
             <x-inputs.text id="code" class="mt-2 w-full" name="code" type="text" :value="old('code')" autofocus placeholder="{{ __('Class code') }}" />
-            <x-inputs.input-error class="mt-2" :messages="$errors->get('code')" />
+            <x-inputs.error class="mt-2" :messages="$errors->get('code')" />
         </div>
 
         <div class="mt-6">
             <x-inputs.label value="{{ __('Name') }}" for="name" />
             <x-inputs.text id="name" class="mt-2 w-full" name="name" type="text" :value="old('name')" autofocus placeholder="{{ __('Class name') }}" />
-            <x-inputs.input-error class="mt-2" :messages="$errors->get('name')" />
+            <x-inputs.error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
         <div class="mt-6">
@@ -26,7 +26,7 @@
                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                 @endforeach
             </x-inputs.select-input>
-            <x-inputs.input-error class="mt-2" :messages="$errors->get('categories')" />
+            <x-inputs.error class="mt-2" :messages="$errors->get('categories')" />
         </div>
 
         <div class="mt-6">
@@ -34,7 +34,7 @@
             <x-inputs.area id="description" class="mt-2 w-full" name="description" placeholder="{{ __('Class description') }}">
                 {{ old('description') }}
             </x-inputs.area>
-            <x-inputs.input-error class="mt-2" :messages="$errors->get('description')" />
+            <x-inputs.error class="mt-2" :messages="$errors->get('description')" />
         </div>
 
         <div class="mt-6">
@@ -45,7 +45,7 @@
                     <option value="{{ $teacher->id }}">{{ $teacher->name }}</option>
                 @endforeach
             </x-inputs.select-input>
-            <x-inputs.input-error class="mt-2" :messages="$errors->get('teacher_id')" />
+            <x-inputs.error class="mt-2" :messages="$errors->get('teacher_id')" />
         </div>
 
         <div class="modal-action">
