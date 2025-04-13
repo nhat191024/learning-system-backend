@@ -30,7 +30,7 @@
             <div class="mt-6">
                 <x-input-label for="password" value="{{ __('Password') }}" class="sr-only" />
 
-                <x-text-input
+                <x-inputs.text
                     id="password"
                     name="password"
                     type="password"
@@ -38,7 +38,7 @@
                     placeholder="{{ __('Password') }}"
                 />
 
-                <x-input-error :messages="$errors->userDeletion->get('password')" class="mt-2" />
+                <x-inputs.error :messages="$errors->userDeletion->get('password')" class="mt-2" />
             </div>
 
             <div class="mt-6 flex justify-end">
