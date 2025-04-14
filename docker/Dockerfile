@@ -41,4 +41,4 @@ RUN docker-php-ext-enable opcache
 
 EXPOSE 80
 
-CMD php artisan migrate && php artisan serve --host=0.0.0.0 --port=80
+CMD php artisan serve --host=0.0.0.0 --port=80
