@@ -226,8 +226,6 @@ class AssignmentController extends Controller
             }),
         ];
 
-        return response()->json([
-            'assignment' => $response,
-        ], Response::HTTP_OK);
+        return response()->json($response, Response::HTTP_OK);
     }
 }
