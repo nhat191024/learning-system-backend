@@ -201,13 +201,15 @@ class ClassController extends Controller
         $assignments = ClassAssignment::where('class_id', $id)->with('submits', 'quizzes')->get();
 
         $respond = $assignments->map(function ($assignment) {
+            $isSubmitted = $assignment->submits->where('student_id', 4)->first();
             return [
                 'title' => $assignment->title,
                 'type' => $assignment->type,
                 'dueDate' => Carbon::parse($assignment->due_date)->format('H:i j M Y'),
                 'score' => $assignment->submits->where('student_id', Auth::id())->first()->score ?? 0,
                 'total_score' => $assignment->type == 'quiz' ? $assignment->quizzes->count() : 0,
-                'handed_in' => $assignment->submits->where('student_id', Auth::id())->first() ? true : false,
+                'handed_date' => $isSubmitted ? Carbon::parse($assignment->submits->where('student_id', 4)->first()->created_at)->format('H:i j M Y') : null,
+                'handed_in' => $isSubmitted ? true : false,
             ];
         });
 
