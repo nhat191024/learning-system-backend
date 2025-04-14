@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY composer.lock composer.json
 
-RUN composer install --no-dev --optimize-autoloader
+RUN /usr/local/bin/composer install --no-dev --optimize-autoloader
 
 FROM node:slim AS builder
 
