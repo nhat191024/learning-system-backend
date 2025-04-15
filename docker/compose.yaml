@@ -10,6 +10,8 @@ services:
     volumes:
       - ./storage:/usr/share/nginx/html/storage:rw
       - ./public:/usr/share/nginx/html/public:rw
+    networks:
+      - app-network
 
   nginx:
     image: nginx:1-alpine
@@ -20,7 +22,13 @@ services:
       - ./nginx.conf:/etc/nginx/templates/default.conf.template
       - ./storage:/usr/share/nginx/html/storage:rw
       - ./public:/usr/share/nginx/html/public:ro
+    networks:
+      - app-network
 
 volumes:
   storage:
   public:
+
+networks:
+  app-network:
+    driver: bridge
