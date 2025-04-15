@@ -8,5 +8,5 @@ services:
     ports:
       - "9090:80"
     networks:
-      - docker-network
+      - app_network
     env_file: ../.env
