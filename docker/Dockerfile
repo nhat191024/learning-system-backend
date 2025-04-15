@@ -1,17 +1,16 @@
 FROM php:8.3.11-fpm
 
 # Update package list and install dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libzip-dev \
     libpng-dev \
-    postgresql-client \
     libpq-dev \
     nodejs \
     npm \
     libfreetype6-dev \
     libjpeg62-turbo-dev \
-    libpng-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install zip pdo_mysql gd bcmath \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -19,10 +18,6 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
-
-RUN docker-php-ext-install zip pdo_mysql gd bcmath zip
-# && pecl install redis \
-# && docker-php-ext-enable redis
 
 WORKDIR /usr/share/nginx/html/
 
@@ -41,7 +36,7 @@ RUN sed 's_@php artisan package:discover_/bin/true_;' -i composer.json \
 # Copy entrypoint
 COPY ./scripts/php-fpm-entrypoint /usr/local/bin/php-entrypoint
 
-# Give permisisons to everything in bin/
+# Give permissions to everything in bin/
 RUN chmod a+x /usr/local/bin/*
 
 ENTRYPOINT ["/usr/local/bin/php-entrypoint"]
