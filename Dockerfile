@@ -34,7 +34,7 @@ RUN composer install --optimize-autoloader --no-dev
 # Tạo file storage và cache directories và cấp quyền ghi
 RUN mkdir -p storage bootstrap/cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-RUN chmod -R 755 /var/www/storage /var/www/bootstrap/cache
+RUN chmod -R 777 /var/www/storage /var/www/bootstrap/cache
 
 # Chạy các lệnh cần thiết cho Laravel (ví dụ: generate key)
 RUN php artisan key:generate
