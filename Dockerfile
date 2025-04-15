@@ -34,8 +34,6 @@ RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 RUN chmod -R 777 /var/www/storage /var/www/bootstrap/cache
 RUN chmod -R a+rw storage
 
-COPY .env.example .env
-
 # Cài đặt các dependency của Laravel
 RUN composer install --optimize-autoloader --no-dev
 
