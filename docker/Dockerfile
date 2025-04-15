@@ -1,44 +1,45 @@
-FROM php:8.3-fpm-alpine AS composer
+# syntax=docker/dockerfile:1
 
-WORKDIR /app
+# Stage 1: Base image with PHP and Composer
+FROM php:8.2-fpm AS base
 
-COPY composer.lock composer.json
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    libzip-dev \
+    unzip \
+    git \
+    libfreetype6-dev \
+    libjpeg62-turbo-dev \
+    libpng-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install zip pdo_mysql gd
 
-RUN /usr/local/bin/composer install --no-dev --optimize-autoloader
+# Install Composer
+COPY --link --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-FROM node:slim AS builder
+# Stage 2: Application setup
+FROM base AS app-setup
 
-WORKDIR /app
-
-COPY package*.json ./
-COPY vite.config.js ./
-
-RUN npm install
-COPY resources resources
-COPY public public
-
-RUN npm run build
-
-
-FROM php:8.3-fpm-alpine
-
+# Set working directory
 WORKDIR /var/www/html
 
-RUN docker-php-ext-install pdo pdo_mysql bcmath gd
+# Copy application files
+COPY --link . .
 
-COPY --from=composer /usr/local/bin/composer /usr/local/bin/composer
-COPY --from=composer /app /var/www/html
+# Install PHP dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-COPY . .
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html
 
-COPY --from=builder /app/public /var/www/html/public
+# Stage 3: Final image
+FROM base AS final
 
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-RUN chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
+# Copy application from the setup stage
+COPY --from=app-setup /var/www/html /var/www/html
 
-RUN docker-php-ext-install opcache
-RUN docker-php-ext-enable opcache
+# Expose port 9000 for PHP-FPM
+EXPOSE 9000
 
-EXPOSE 80
-
-CMD php artisan serve --host=0.0.0.0 --port=80
+# Set the entrypoint to PHP-FPM
+CMD ["php-fpm"]

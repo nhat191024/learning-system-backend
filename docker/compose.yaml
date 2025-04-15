@@ -1,0 +1,15 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    restart: unless-stopped
+    init: true
+    ports:
+      - "9000:9000"
+    networks:
+      - app_network
+    env_file: ../.env
+networks:
+  app_network:
+    driver: bridge
