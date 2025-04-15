@@ -8,8 +8,5 @@ services:
     ports:
       - "9090:80"
     networks:
-      - app_network
+      - docker-networks
     env_file: ../.env
-networks:
-  app_network:
-    driver: bridge
