@@ -1,36 +1,47 @@
-FROM php:8.4.6-apache
+FROM php:8.3.11-fpm
 
-# Install dependencies
+# Update package list and install dependencies
 RUN apt-get update && apt-get install -y \
     libzip-dev \
-    unzip \
-    git \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
     libpng-dev \
+    postgresql-client \
+    libpq-dev \
+    nodejs \
+    npm \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install zip pdo_mysql gd
-
-# Enable Apache modules
-RUN a2enmod rewrite
-
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
-RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/000-default.conf \
-    && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 
-# Set working directory
-COPY . /var/www/html
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Install PHP dependencies
-# RUN composer install --no-dev --optimize-autoloader
+# Install required packages
+RUN docker-php-ext-install pdo pgsql pdo_pgsql gd bcmath zip \
+    && pecl install redis \
+    && docker-php-ext-enable redis
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html
+WORKDIR /usr/share/nginx/html/
 
-USER www-data
+# Copy the codebase
+COPY . ./
 
-# Expose port 80
-EXPOSE 80
+# Run composer install for production and give permissions
+RUN sed 's_@php artisan package:discover_/bin/true_;' -i composer.json \
+    && composer install --ignore-platform-req=php --no-dev --optimize-autoloader \
+    && composer clear-cache \
+    && php artisan package:discover --ansi \
+    && chmod -R 775 storage \
+    && chown -R www-data:www-data storage \
+    && mkdir -p storage/framework/sessions storage/framework/views storage/framework/cache
+
+# Copy entrypoint
+COPY ./scripts/php-fpm-entrypoint /usr/local/bin/php-entrypoint
+
+# Give permisisons to everything in bin/
+RUN chmod a+x /usr/local/bin/*
+
+ENTRYPOINT ["/usr/local/bin/php-entrypoint"]
+
+CMD ["php-fpm"]
