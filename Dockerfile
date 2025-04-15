@@ -31,6 +31,15 @@ RUN composer install
 # RUN chmod -R a+rw storage
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+# Cài đặt các dependency của Node.js
+RUN npm install
+
+# Chạy lệnh build cho vite
+RUN npm run build
+
+# tạo key cho ứng dụng Laravel
+RUN php artisan key:generate
+
 # Expose port 9000 cho PHP-FPM
 EXPOSE 9000
 
