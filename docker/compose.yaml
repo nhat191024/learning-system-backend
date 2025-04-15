@@ -6,8 +6,7 @@ services:
     restart: unless-stopped
     ports:
       - 9000:9000
-    env_file:
-      - ../ .env
+    env_file: ../.env
     volumes:
       - storage:/usr/share/nginx/html/storage:rw
       - public:/usr/share/nginx/html/public:rw
