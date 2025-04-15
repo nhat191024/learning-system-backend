@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # Stage 1: Base image with PHP and Composer
-FROM php:8.2-fpm AS base
+FROM php:8.4-fpm AS base
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -39,7 +39,7 @@ FROM base AS final
 COPY --from=app-setup /var/www/html /var/www/html
 
 # Expose port 9000 for PHP-FPM
-EXPOSE 9000
+EXPOSE 9090
 
 # Set the entrypoint to PHP-FPM
 CMD ["php-fpm"]
