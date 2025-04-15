@@ -22,7 +22,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 WORKDIR /usr/share/nginx/html/
 
 # Copy the codebase
-COPY . ./
+COPY . /usr/share/nginx/html/
 
 # Run composer install for production and give permissions
 RUN sed 's_@php artisan package:discover_/bin/true_;' -i composer.json \
