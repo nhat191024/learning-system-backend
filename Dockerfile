@@ -28,13 +28,15 @@ COPY . /var/www
 # Cấp quyền sở hữu cho user www-data đối với toàn bộ thư mục /var/www
 RUN chown -R www-data:www-data /var/www
 
-# Cài đặt các dependency của Laravel
-RUN composer install --optimize-autoloader --no-dev
 
 # Tạo file storage và cache directories và cấp quyền ghi
 RUN mkdir -p storage bootstrap/cache
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 RUN chmod -R 777 /var/www/storage /var/www/bootstrap/cache
+RUN chmod -R a+rw storage
+
+# Cài đặt các dependency của Laravel
+RUN composer install --optimize-autoloader --no-dev
 
 # Chạy các lệnh cần thiết cho Laravel (ví dụ: generate key)
 RUN php artisan key:generate
