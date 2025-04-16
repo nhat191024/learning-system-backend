@@ -4,16 +4,9 @@
     file_server
     encode gzip
 
-    tls {
-        on_demand
+	on_demand_tls {
         ask http://localhost:80/caddy/verify
-    }
-
-    {
-	    on_demand_tls {
-                ask http://localhost:80/caddy/verify
-	    }
-    }
+	}
 
     https:// {
 	tls {
