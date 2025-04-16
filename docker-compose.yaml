@@ -7,6 +7,6 @@ services:
     container_name: learning-system-web
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - "10000:80"
     volumes:
       - .:/var/www/html
