@@ -1,20 +1,10 @@
-:443 {
+443 {
     root * /var/www/public
     php_fastcgi laravel-app:9000
     file_server
     encode gzip
 
-	on_demand_tls {
-        ask http://localhost:80/caddy/verify
-	}
-
-    https:// {
-	tls {
-		on_demand
-	}
-}
-
-
+    tls internal
 
     log {
         output stdout
