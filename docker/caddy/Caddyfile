@@ -1,0 +1,16 @@
+:443 {
+    root * /var/www/public
+    php_fastcgi laravel-app:9000
+    file_server
+    encode gzip
+
+    # Tự động cấp SSL bằng Let's Encrypt
+    tls {
+        on_demand
+    }
+
+    log {
+        output stdout
+        format console
+    }
+}
