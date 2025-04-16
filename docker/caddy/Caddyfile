@@ -6,6 +6,7 @@
 
     tls {
         on_demand
+        ask http://localhost:80/caddy/verify
     }
 
     log {

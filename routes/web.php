@@ -23,4 +23,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+//caddy verify, this route is used to verify the domain with caddy and always return 200
+Route::get('/caddy/verify', function () {
+    return response()->json(['status' => 'ok']);
+})->name('caddy.verify');
+
 require __DIR__ . '/auth.php';
