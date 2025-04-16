@@ -4,7 +4,6 @@
     file_server
     encode gzip
 
-    # Tự động cấp SSL bằng Let's Encrypt
     tls {
         on_demand
     }
