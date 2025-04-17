@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\LoginController;
 use App\Http\Controllers\Api\V1\ClassController;
 use App\Http\Controllers\Api\V1\CourseController;
+use App\Http\Controllers\Api\V1\CourseAssignmentController;
 
 // Public routes
 Route::post('/login', [LoginController::class, 'login']);
@@ -68,6 +69,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:student']], function () 
         Route::get('/get', [CourseController::class, 'index']);
         Route::get('/getById/{id}', [CourseController::class, 'getCourseById']);
         Route::get('/join/{courseId}', [CourseController::class, 'joinCourse']);
+        Route::get('/assignment/{courseId}', [CourseAssignmentController::class, 'getById']);
     });
 
     Route::prefix('assignment')->group(function () {
