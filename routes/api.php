@@ -67,6 +67,7 @@ Route::group(['middleware' => ['auth:sanctum', 'ability:student']], function () 
     Route::prefix('courses')->group(function () {
         Route::get('/get', [CourseController::class, 'index']);
         Route::get('/getById/{id}', [CourseController::class, 'getCourseById']);
+        Route::get('/join/{courseId}', [CourseController::class, 'joinCourse']);
     });
 
     Route::prefix('assignment')->group(function () {

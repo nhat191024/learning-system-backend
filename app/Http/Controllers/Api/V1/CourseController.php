@@ -50,4 +50,31 @@ class CourseController extends Controller
             'createdAt' => $course->created_at,
         ], Response::HTTP_OK);
     }
+
+    public function joinCourse($courseId)
+    {
+        $user = Auth::user();
+        $course = Course::find($courseId);
+
+        if (!$course) {
+            return response()->json([
+                'message' => 'Khoá học không tồn tại',
+            ], Response::HTTP_NOT_FOUND);
+        }
+
+        if ($course->enrollments->contains('student_id', $user->id)) {
+            return response()->json([
+                'message' => 'Bạn đã tham gia khóa học này',
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        $course->enrollments()->create([
+            'course_id' => $courseId,
+            'student_id' => $user->id,
+        ]);
+
+        return response()->json([
+            'message' => 'Tham gia khoá học thành công',
+        ], Response::HTTP_OK);
+    }
 }
