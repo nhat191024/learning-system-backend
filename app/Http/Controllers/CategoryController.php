@@ -5,120 +5,101 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use Illuminate\Http\Request;
 
+use App\Http\Requests\StoreCategoryRequest;
+use App\Http\Requests\UpdateCategoryRequest;
+
+use Illuminate\Support\Facades\DB;
+
 class CategoryController extends Controller
 {
-    // Phương thức index: Hiển thị danh sách danh mục
     public function index()
     {
         $categories = Category::with('children', 'parent')->get();
-        return view('categories.index', compact('categories'));
+        $categoriesWithNoParent = $categories->whereNull('parent_id');
+        return view('admin.category.index', compact('categories', 'categoriesWithNoParent'));
     }
 
-    // Phương thức create: Hiển thị form tạo danh mục
-    public function create()
+    public function store(StoreCategoryRequest $request)
     {
-        $categories = Category::all();
-        return view('categories.create', compact('categories'));
-    }
-
-    // Phương thức store: Lưu danh mục mới vào cơ sở dữ liệu
-    public function store(Request $request)
-    {
-        // Kiểm tra dữ liệu đầu vào
-        $request->validate([
-            'name' => 'required|string|max:255|unique:categories,name', // Thêm kiểm tra không trùng tên
-            'parent_id' => 'nullable|exists:categories,id',
-            'status' => 'required|in:active,inactive',
-        ]);
-
-        // Kiểm tra nếu danh mục cha đã là con của danh mục khác
-        if ($request->parent_id) {
-            $parentCategory = Category::find($request->parent_id);
-            if ($parentCategory->parent_id !== null) {
-                return redirect()->back()->with('error', 'Không thể chọn danh mục cha vì nó đã là con của một danh mục khác.');
-            }
-        }
-
-        // Lưu danh mục mới vào cơ sở dữ liệu
+        DB::beginTransaction();
         try {
+            if ($request->parent_id) {
+                $parentCategory = Category::find($request->parent_id);
+                if ($parentCategory->parent_id !== null) {
+                    return redirect()->back()->with('error', 'Cannot select parent category because it is already a child of another category.');
+                }
+            }
+
             Category::create([
                 'name' => $request->name,
                 'parent_id' => $request->parent_id,
                 'status' => $request->status,
             ]);
 
-            // Chuyển hướng với thông báo thành công
-            return redirect()->route('categories.index')->with('success', 'Danh mục đã được thêm thành công!');
+            DB::commit();
+            return redirect()->back()->with('success', 'Added category successfully!');
         } catch (\Exception $e) {
-            // Xử lý lỗi bất ngờ
-            return redirect()->back()->with('error', 'Đã xảy ra lỗi trong quá trình thêm danh mục. Vui lòng thử lại.');
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to add category: ' . $e->getMessage());
         }
     }
 
-
-    // Phương thức update: Cập nhật danh mục
-    public function update(Request $request, $id)
-    {
-        // Kiểm tra dữ liệu đầu vào
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'parent_id' => 'nullable|exists:categories,id',
-            'status' => 'required|in:active,inactive',
-        ]);
-
-        $category = Category::findOrFail($id);
-
-        // Kiểm tra nếu danh mục cha đã là con của danh mục khác
-        if ($request->parent_id) {
-            $parentCategory = Category::find($request->parent_id);
-            if ($parentCategory->parent_id !== null) {
-                return redirect()->back()->with('error', 'Không thể chọn danh mục cha vì nó đã là con của một danh mục khác.');
-            }
-        }
-
-        // Cập nhật danh mục
-        $category->update([
-            'name' => $request->name,
-            'parent_id' => $request->parent_id,
-            'status' => $request->status,
-        ]);
-
-        // Chuyển hướng với thông báo thành công
-        return redirect()->route('categories.index')->with('success', 'Danh mục đã được cập nhật thành công!');
-    }
     public function edit($id)
-{
-    // Tìm danh mục theo ID
-    $category = Category::findOrFail($id);
+    {
+        $category = Category::findOrFail($id);
+        $categoriesWithNoParent = Category::whereNull('parent_id')->get();
 
-    // Lấy tất cả các danh mục để hiển thị trong danh sách chọn danh mục cha
-    $categories = Category::all();
-
-    // Trả về view chỉnh sửa danh mục
-    return view('categories.edit', compact('category', 'categories'));
-}
-public function destroy($id)
-{
-    $category = Category::findOrFail($id);
-
-    // Kiểm tra nếu danh mục có danh mục con
-    if ($category->children()->count() > 0) {
-        return redirect()->back()->with('error', 'Không thể xóa danh mục vì nó có danh mục con.');
+        return view('admin.category.edit', compact('category', 'categoriesWithNoParent'));
     }
 
-    // Xóa danh mục
-    $category->delete();
+    public function update(UpdateCategoryRequest $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $category = Category::findOrFail($id);
 
-    return redirect()->route('categories.index')->with('success', 'Danh mục đã được xóa thành công!');
-}
-public function status($id)
-{
-    $category = Category::findOrFail($id);
-    $category->status = $category->status === 'active' ? 'inactive' : 'active';
-    $category->save();
+            if ($category->children()->count() > 0 && $request->parent_id) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Cannot change parent category because it has child categories.');
+            }
 
-    return redirect()->route('categories.index')->with('success', 'Trạng thái danh mục đã được cập nhật!');
-}
+            if ($request->parent_id) {
+                $parentCategory = Category::find($request->parent_id);
+                if (!$parentCategory || $parentCategory->parent_id !== null) {
+                    DB::rollBack();
+                    return back()->with('error', 'Cannot select parent category because it is already a child of another category.');
+                }
+            }
 
+            $category->update($request->only(['name', 'parent_id', 'status']));
 
+            DB::commit();
+            return redirect()->route('admin.category.index')->with('success', 'Category updated successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to update category: ' . $e->getMessage());
+        }
+    }
+
+    public function destroy($id)
+    {
+        DB::beginTransaction();
+        try {
+            $category = Category::findOrFail($id);
+
+            if ($category->children()->count() > 0) {
+                DB::rollBack();
+                return redirect()->route('admin.category.index')->with('error', 'Cannot delete category with child categories.');
+            }
+
+            $category->status = $category->status === 'active' ? 'inactive' : 'active';
+            $category->save();
+
+            DB::commit();
+            return redirect()->route('admin.category.index')->with('success', 'Category deleted successfully!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to delete category: ' . $e->getMessage());
+        }
+    }
 }
