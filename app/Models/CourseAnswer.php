@@ -9,7 +9,7 @@ class CourseAnswer extends Model
     protected $fillable = [
         'course_submit_id',
         'quiz_id',
-        'answer'
+        'choice_id'
     ];
 
     public function courseSubmit()
