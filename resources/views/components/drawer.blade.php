@@ -22,6 +22,12 @@
                         </x-actions.sidebar-link>
                     </li>
                     <li>
+                        <x-actions.sidebar-link :href="route('admin.category.index')" :active="request()->routeIs('admin.category.index')">
+                            <x-icons.category class="h-5 w-5" />
+                            {{ __('Category') }}
+                        </x-actions.sidebar-link>
+                    </li>
+                    <li>
                         <x-actions.sidebar-link :href="route('admin.class.index')" :active="request()->routeIs('admin.class.index')">
                             <x-icons.school class="h-5 w-5" />
                             {{ __('Class') }}
