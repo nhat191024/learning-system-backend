@@ -8,7 +8,8 @@ use App\Models\Category;
 
 use App\Http\Requests\StoreClassRequest;
 use App\Http\Requests\UpdateClassRequest;
-
+use App\Models\ClassAssignment;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -68,6 +69,53 @@ class ClassController extends Controller
     public function detail($id, $assignment_id = null)
     {
         $class = Classes::with(['categories', 'teacher', 'students.certificates', 'assignments'])->findOrFail($id);
+
+        $assignments = ClassAssignment::where('class_id', $id)->with('submits.user')->get();
+        $enrollment = Enrollment::where('class_id', $id)->with('student')->get();
+
+        $assignmentName = $assignments->map(function ($assignment) {
+            return $assignment->title;
+        })->values();
+
+        $students = $enrollment->map(function ($student) {
+            return $student->student->name;
+        });
+
+        $assignmentPoint = $students->map(function ($studentName) use ($assignments) {
+            $points = $assignments->map(function ($assignment) use ($studentName) {
+                $submit = $assignment->submits->firstWhere('user.name', $studentName);
+                if ($assignment->type == 'quiz') {
+                    return [
+                        'score' => $submit ? $submit->score : 0,
+                    ];
+                } else {
+                    return [
+                        'score' => $submit ? "Đã nộp bài" : "Chưa nộp bài",
+                    ];
+                }
+            })->values();
+
+            $totalScore = $assignments->map(function ($assignment) {
+                if ($assignment->type == 'quiz') {
+                    return [
+                        'totalScore' => $assignment->quizzes->count()
+                    ];
+                } else {
+                    return [
+                        'totalScore' => "Không có tông điểm",
+                    ];
+                }
+            })->values();
+
+            return [
+                'name' => $studentName,
+                'points' => $points,
+                'totalScore' => $totalScore,
+            ];
+        })->values();
+
+        // dd($assignmentPoint[0]['points'][0]['score']);
+
         $teachers = cache()->remember('teachers', now()->addMinutes(10), function () {
             return User::where('role_id', 2)->get();
         });
@@ -80,7 +128,7 @@ class ClassController extends Controller
             })
             ->get();
 
-        return view('admin.class.detail', compact('class', 'teachers', 'categories', 'students'));
+        return view('admin.class.detail', compact('class', 'teachers', 'categories', 'students', 'assignmentPoint', 'assignmentName'));
     }
 
     /**
