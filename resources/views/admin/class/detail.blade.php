@@ -18,11 +18,13 @@
                 <a class="tab tab-active" data-tab="tab1" role="tab">{{ __('Info') }}</a>
                 <a class="tab" data-tab="tab2" role="tab">{{ __('Student') }}</a>
                 <a class="tab" data-tab="tab3" role="tab">{{ __('Assignment') }}</a>
+                <a class="tab" data-tab="tab4" role="tab">{{ __('Point') }}</a>
             </div>
 
             @include('admin.class.partials.info-tab')
             @include('admin.class.partials.student-tab')
             @include('admin.class.partials.assignment-tab')
+            @include('admin.class.partials.point-tab')
 
         </div>
     </div>
