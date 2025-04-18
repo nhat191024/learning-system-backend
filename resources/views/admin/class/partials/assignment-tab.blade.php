@@ -34,8 +34,11 @@
                     <td>
                         <div class="join">
                             <a class="btn btn-soft btn-info join-item" href="{{ route('admin.classAssignment.detail', ['id' => $assignment->id, 'classId' => $class->id]) }}" @disabled($assignment->type == 'lab')>{{ __('Detail') }}</a>
-                            <a class="btn btn-soft btn-primary join-item">{{ __('Result') }}</a>
-                            <a class="btn btn-soft btn-error join-item">{{ __('Deactive') }}</a>
+                            @if ($assignment->status == 'published')
+                                <a class="btn btn-soft btn-error join-item" href="{{ route('admin.classAssignment.destroy', $assignment->id) }}">{{ __('Deactive') }}</a>
+                            @else
+                                <a class="btn btn-soft btn-success join-item" href="{{ route('admin.classAssignment.destroy', $assignment->id) }}">{{ __('Active') }}</a>
+                            @endif
                         </div>
                     </td>
                 </tr>
