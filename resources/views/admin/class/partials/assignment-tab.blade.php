@@ -33,7 +33,9 @@
                     <td>{{ $assignment->created_at->format('H:i d/m/Y ') }}</td>
                     <td>
                         <div class="join">
-                            <a class="btn btn-soft btn-info join-item">{{ __('Detail') }}</a>
+                            <a class="btn btn-soft btn-info join-item" href="{{ route('admin.classAssignment.detail', ['id' => $assignment->id, 'classId' => $class->id]) }}" @disabled($assignment->type == 'lab')>{{ __('Detail') }}</a>
+                            <a class="btn btn-soft btn-primary join-item">{{ __('Result') }}</a>
+                            <a class="btn btn-soft btn-error join-item">{{ __('Deactive') }}</a>
                         </div>
                     </td>
                 </tr>
