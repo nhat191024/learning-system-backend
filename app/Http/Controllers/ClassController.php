@@ -10,6 +10,7 @@ use App\Http\Requests\StoreClassRequest;
 use App\Http\Requests\UpdateClassRequest;
 use App\Models\ClassAssignment;
 use App\Models\Enrollment;
+use App\Models\QuizPackage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -114,8 +115,6 @@ class ClassController extends Controller
             ];
         })->values();
 
-        // dd($assignmentPoint[0]['points'][0]['score']);
-
         $teachers = cache()->remember('teachers', now()->addMinutes(10), function () {
             return User::where('role_id', 2)->get();
         });
@@ -128,7 +127,18 @@ class ClassController extends Controller
             })
             ->get();
 
-        return view('admin.class.detail', compact('class', 'teachers', 'categories', 'students', 'assignmentPoint', 'assignmentName'));
+        // Eager load quizzes relationship with count
+        $quizPackages = QuizPackage::with(['quizzes' => function ($query) {
+            $query->select('id', 'quiz_package_id'); // Select only needed fields for efficiency
+        }])->get();
+
+        // Transform the packages to include quiz count explicitly
+        $quizPackages = $quizPackages->map(function ($package) {
+            $package->quiz_count = $package->quizzes->count();
+            return $package;
+        });
+
+        return view('admin.class.detail', compact('class', 'teachers', 'categories', 'students', 'assignmentPoint', 'assignmentName', 'quizPackages'));
     }
 
     /**
