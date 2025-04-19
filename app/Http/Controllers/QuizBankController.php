@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreQuestionRequest;
-
-use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Requests\StoreQuizBankRequest;
+use App\Http\Requests\UpdateQuizBankRequest;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -26,9 +26,7 @@ class QuizBankController extends Controller
     {
         $quizBank = QuizPackage::orderBy('created_at', 'DESC')->with('creator', 'categories')->get();
         $categories = Category::orderBy('created_at', 'DESC')->get();
-        $quizzes = Quiz::orderBy('created_at', 'DESC')->get();
-        $profile = User::findOrFail(Auth::id());
-        return view('admin.quiz_bank.index', compact('quizBank', 'categories', 'quizzes', 'profile'));
+        return view('admin.quiz_bank.index', compact('quizBank', 'categories'));
     }
 
     public function questions($id)
@@ -99,16 +97,15 @@ class QuizBankController extends Controller
         }
     }
 
-
-    public function createQuizBank(Request $request)
+    public function store(StoreQuizBankRequest $request)
     {
-        dd($request->all());
+        DB::beginTransaction();
         try {
             $createQuizBank = QuizPackage::create([
                 'creator_id' => Auth::id(),
-                'title' => $request->quiz_name,
-                'description' => $request->quiz_description,
-                'quiz_id_range' => $request->quiz_id_range,
+                'title' => $request->title,
+                'description' => $request->description,
+                'quiz_id_range' => 0,
                 'status' => 'published',
                 'type' => $request->type,
             ]);
@@ -119,78 +116,45 @@ class QuizBankController extends Controller
                     'category_id' => $category,
                 ]);
             }
-            return redirect()->route('quiz-bank.index')->with('success', 'Tạo kho quiz thành công!');
+            DB::commit();
+            return redirect()->back()->with('success', 'Added quiz bank successfully!');
         } catch (\Throwable $th) {
-            return redirect()->route('quiz-bank.index')->with('error', 'Tạo kho quiz thất bại!');
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error: ' . $th->getMessage());
         }
     }
 
-    public function updateQuizBank(Request $request)
+    public function edit($id)
     {
-        if (Auth::check()) {
-            // try {
-            $updateQuizBank = QuizPackage::find($request->quiz_id);
+        $quizBank = QuizPackage::with('categories')->findOrFail($id);
+        $categories = Category::orderBy('created_at', 'DESC')->get();
+        return view('admin.quiz_bank.edit', compact('quizBank', 'categories'));
+    }
 
-            if (!$updateQuizBank) {
-                return redirect()->route('quiz-bank.index')->with('error', 'Kho quiz không tồn tại!');
-            }
-
-            $updateQuizBank->update([
-                'creator_id' => Auth::id(),
-                'title' => $request->quiz_name,
-                'description' => $request->quiz_description,
-                'quiz_id_range' => $request->quiz_id_range,
-                'status' => 'published',
+    public function update(UpdateQuizBankRequest $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $quizBank = QuizPackage::findOrFail($id);
+            $quizBank->update([
+                'title' => $request->title,
+                'description' => $request->description,
                 'type' => $request->type,
             ]);
 
-            QuizPackageCategory::where('quiz_package_id', $updateQuizBank->id)->delete();
+            QuizPackageCategory::where('quiz_package_id', $id)->delete();
 
-            if ($request->categories) {
-                foreach ($request->categories as $category) {
-                    QuizPackageCategory::create([
-                        'quiz_package_id' => $updateQuizBank->id,
-                        'category_id' => $category,
-                    ]);
-                }
+            foreach ($request->categories as $category) {
+                QuizPackageCategory::insert([
+                    'quiz_package_id' => $id,
+                    'category_id' => $category,
+                ]);
             }
-
-            return redirect()->route('quiz-bank.index')->with('success', 'Cập nhật kho quiz thành công!');
-            // } catch (\Throwable $th) {
-            return redirect()->route('quiz-bank.index')->with('error', 'Cập nhật kho quiz thất bại!')->with('message', $th->getMessage());
-            // }
-        } else {
-            return redirect()->route('admin.login');
-        }
-    }
-
-    public function hiddenQuizBank($id)
-    {
-        if (Auth::check()) {
-            $hiddenQuizBank = QuizPackage::where('id', $id)->update(['type' => 'private']);
-
-            if ($hiddenQuizBank) {
-                return redirect()->route('quiz-bank.index')->with('success', 'Ẩn kho quiz thành công!');
-            } else {
-                return redirect()->route('quiz-bank.index')->with('error', 'Ẩn kho quiz thất bại!');
-            }
-        } else {
-            return redirect()->route('admin.login');
-        }
-    }
-
-    public function showQuizBank($id)
-    {
-        if (Auth::check()) {
-            $showQuizBank = QuizPackage::where('id', $id)->update(['type' => 'public']);
-
-            if ($showQuizBank) {
-                return redirect()->route('quiz-bank.index')->with('success', 'Hiển thị kho quiz thành công!');
-            } else {
-                return redirect()->route('quiz-bank.index')->with('error', 'Hiển thị kho quiz thất bại!');
-            }
-        } else {
-            return redirect()->route('admin.login');
+            DB::commit();
+            return redirect()->route('admin.quizBank.index')->with('success', 'Updated quiz bank successfully!');
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Error: ' . $th->getMessage());
         }
     }
 }
