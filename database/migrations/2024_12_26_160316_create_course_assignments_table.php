@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description');
             $table->string('duration')->nullable();
+            $table->enum('status', ['published', 'closed']);
             $table->timestamps();
         });
     }
