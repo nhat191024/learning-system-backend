@@ -70,6 +70,12 @@ class ClassAssignmentController extends Controller
 
             $package = QuizPackage::find($request->quiz_package_id);
             $numberOfQuestions = $request->question_count;
+
+            if ($numberOfQuestions > $package->quizzes->count()) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Number of questions exceeds available quizzes in the package (' . $package->quizzes->count() . ')');
+            }
+
             for ($i = 0; $i < $numberOfQuestions; $i++) {
                 $quiz = $package->quizzes->random();
                 AssignmentQuiz::create([
@@ -91,17 +97,21 @@ class ClassAssignmentController extends Controller
      */
     public function destroy(Request $request, $id)
     {
+        DB::beginTransaction();
         try {
             $assignment = ClassAssignment::find($id);
             if (!$assignment) {
+                DB::rollBack();
                 return redirect()->back()->with('error', 'Không tìm thấy bài tập.');
             }
 
             $assignment->status = $assignment->status === 'published' ? 'closed' : 'published';
             $assignment->save();
 
+            DB::commit();
             return redirect()->back()->with('success', 'Change assignment status successfully!');
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
         }
     }
