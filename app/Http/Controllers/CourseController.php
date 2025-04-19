@@ -2,284 +2,231 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Category;
 use App\Models\User;
 use App\Models\Course;
-use App\Models\CourseQuiz;
 use App\Models\QuizPackage;
 use App\Models\CourseAssignment;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+use App\Http\Requests\StoreCourseRequest;
+use App\Http\Requests\UpdateCourseRequest;
+use App\Models\CourseEnrollment;
 use Maatwebsite\Excel\Facades\Excel;
 use Maatwebsite\Excel\Concerns\FromArray;
 
 class CourseController extends Controller
 {
+    /**
+     * Display a listing of courses and students.
+     */
     public function index(Request $request)
     {
-        $courses = Course::query();
+        $courses = Course::with('categories')->get();
+        $categories = cache()->remember('categories', now()->addMinutes(10), function () {
+            return Category::all();
+        });
 
-        if ($request->filled('search')) {
-            $courses->where('name', 'like', '%' . $request->search . '%')
-                ->orWhere('code', 'like', '%' . $request->search . '%');
-        }
-
-        $courses = $courses->paginate($request->get('per_page', 25));
-
-        return view('course.index', compact('courses'));
+        return view('admin.course.index', compact('courses', 'categories'));
     }
 
-    public function store(Request $request)
+    /**
+     * Store a new course.
+     */
+    public function store(StoreCourseRequest $request)
     {
-        $request->validate([
-            'code' => 'required|unique:courses',
-            'name' => 'required',
-            'description' => 'required',
-            'status' => 'required',
-        ]);
-
-        Course::create($request->all());
-
-        return redirect()->route('courses.index')->with('success', 'Khóa học đã được tạo thành công.');
-    }
-
-    public function edit($id)
-    {
-        $course = Course::findOrFail($id);
-        return view('courses.edit', compact('course'));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $request->validate([
-            'code' => 'required|unique:courses,code,' . $id,
-            'name' => 'required',
-            'description' => 'required',
-            'status' => 'required',
-        ]);
-
-        $course = Course::findOrFail($id);
-        $course->update($request->all());
-
-        return redirect()->route('courses.index')->with('success', 'Khóa học đã được cập nhật thành công.');
-    }
-
-    public function storeAssignment(Request $request, $courseId)
-    {
+        DB::beginTransaction();
         try {
-            $request->validate([
-                'title' => 'required',
-                'video_url' => 'required|url',
-                'description' => 'required',
-                'duration' => 'nullable|integer',
-                'number_of_questions' => 'required|integer|min:5|max:100',
-                'quiz_select' => 'required'
-            ]);
-
-            $course = Course::findOrFail($courseId);
-
-            $assignment = new CourseAssignment([
-                'course_id' => $course->id,
-                'title' => $request->title,
-                'video_url' => $request->video_url,
+            $course = Course::create([
+                'code' => $request->code,
+                'name' => $request->name,
                 'description' => $request->description,
-                'duration' => $request->duration,
+                'status' => 'published',
             ]);
 
-            $course->assignments()->save($assignment);
-
-            $quizPackage = QuizPackage::findOrFail($request->quiz_select);
-            $quizIdArray = [];
-            foreach ($quizPackage->quizzes as $quiz) {
-                $quizIdArray[] = $quiz->id;
-            }
-            $randomQuizIds = array_rand(array_flip($quizIdArray), min($request->number_of_questions, count($quizIdArray)));
-            $randomQuizIds = (array) $randomQuizIds;
-
-            foreach ($randomQuizIds as $quizID) {
-                CourseQuiz::insert([
-                    'course_assignment_id' => $assignment->id,
-                    'quiz_id' => $quizID,
-                ]);
+            foreach ($request->categories as $categoryId) {
+                $course->categories()->attach($categoryId);
             }
 
-            return redirect()->route('courses.show', $courseId)->with('success', 'Bài học đã được thêm thành công.');
-        } catch (\Throwable $th) {
-            return redirect()->route('courses.show', $courseId)->with('error', 'Bài học thêm thất bại.');
+            DB::commit();
+            return redirect()->back()->with('success', 'Added course successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
         }
     }
 
-    public function updateAssignment(Request $request, $courseId, $assignmentId)
+    /**
+     * Display course details.
+     */
+    public function detail($id, $assignment_id = null)
     {
+        $course = Course::with(['categories', 'students', 'assignments'])->findOrFail($id);
 
-        try {
-            $request->validate([
-                'title' => 'required',
-                'video_url' => 'required|url',
-                'description' => 'required',
-                'duration' => 'nullable|integer',
-                'number_of_questions' => 'required|integer|min:5|max:100',
-                'quiz_select' => 'required'
-            ]);
+        $assignments = CourseAssignment::where('course_id', $id)
+            ->with('courseSubmits.student')
+            ->get();
 
-            $course = Course::findOrFail($courseId);
-            $assignment = CourseAssignment::findOrFail($assignmentId);
+        $enrollments = CourseEnrollment::where('course_id', $id)
+            ->with('user')
+            ->get();
 
-            $assignment->title = $request->title;
-            $assignment->video_url = $request->video_url;
-            $assignment->description = $request->description;
-            $assignment->duration = $request->duration;
-            $assignment->save();
+        $assignmentNames = $assignments->pluck('title')->values();
 
-            $quizPackage = QuizPackage::findOrFail($request->quiz_select);
-            $quizIdArray = [];
-            foreach ($quizPackage->quizzes as $quiz) {
-                $quizIdArray[] = $quiz->id;
-            }
+        $studentNames = $enrollments->pluck('user.name');
 
-            $randomQuizIds = array_rand(array_flip($quizIdArray), min($request->number_of_questions, count($quizIdArray)));
-            $randomQuizIds = (array) $randomQuizIds;
+        $assignmentPoints = $studentNames->map(function ($studentName) use ($assignments) {
+            $points = $assignments->map(function ($assignment) use ($studentName) {
+                $submit = $assignment->courseSubmits->first(function ($submit) use ($studentName) {
+                    return $submit->student->name === $studentName;
+                });
 
-            foreach ($assignment->courseQuizzes as $courseQuiz) {
-                $courseQuiz->delete();
-            }
+                return [
+                    'score' => $submit ? $submit->score : 0,
+                ];
+            })->values();
 
-            foreach ($randomQuizIds as $quizID) {
-                CourseQuiz::insert([
-                    'course_assignment_id' => $assignment->id,
-                    'quiz_id' => $quizID,
-                ]);
-            }
+            $totalScores = $assignments->map(function ($assignment) {
 
-            return redirect()->route('courses.show', $courseId)->with('success', 'Bài học đã được cập nhật thành công.');
-        } catch (\Throwable $th) {
-            return redirect()->route('courses.show', $courseId)->with('error', 'Cập nhật bài học thất bại.');
-        }
-    }
+                return [
+                    'totalScore' => $assignment->courseQuizzes->count()
+                ];
+            })->values();
 
-    public function deleteAssignment($courseId, $assignmentId)
-    {
-        try {
-            $course = Course::findOrFail($courseId);
-            $assignment = CourseAssignment::findOrFail($assignmentId);
+            return [
+                'name' => $studentName,
+                'points' => $points,
+                'totalScore' => $totalScores,
+            ];
+        })->values();
 
-            $assignment->courseQuizzes()->delete();
+        $categories = cache()->remember('categories', now()->addMinutes(10), function () {
+            return Category::all();
+        });
 
-            $assignment->delete();
-
-            return redirect()->route('courses.show', $courseId)->with('success', 'Bài học đã được xóa thành công.');
-        } catch (\Throwable $th) {
-            return redirect()->route('courses.show', $courseId)->with('error', 'Xóa bài học thất bại.');
-        }
-    }
-
-    public function show($id)
-    {
-        $course = Course::with(['enrollments.user'])
-            ->findOrFail($id);
-
-        $studentsNotInCourse = User::where('role_id', 3)
+        $students = User::where('role_id', 3)
             ->whereDoesntHave('courseEnrollments', function ($query) use ($id) {
                 $query->where('course_id', $id);
             })
             ->get();
 
-        $quizPackages = QuizPackage::all();
+        $quizPackages = QuizPackage::with(['quizzes' => function ($query) {
+            $query->select('id', 'quiz_package_id');
+        }])
+            ->get()
+            ->map(function ($package) {
+                $package->quiz_count = $package->quizzes->count();
+                return $package;
+            });
 
-        return view('course.show', compact('course', 'quizPackages', 'studentsNotInCourse'));
-    }
-
-    public function addStudent(Request $request, $courseId)
-    {
-        $course = Course::findOrFail($courseId);
-        $studentIds = $request->input('student_ids');
-
-        if (empty($studentIds)) {
-            return redirect()->back()->with('error', 'Vui lòng chọn ít nhất một học sinh.');
+        $selectedAssignment = null;
+        if ($assignment_id) {
+            $selectedAssignment = $assignments->find($assignment_id);
         }
 
-        foreach ($studentIds as $studentId) {
-            $exists = DB::table('course_enrollments')
-                ->where('course_id', $courseId)
-                ->where('student_id', $studentId)
-                ->exists();
+        return view('admin.course.detail', compact(
+            'course',
+            'categories',
+            'students',
+            'assignmentPoints',
+            'assignmentNames',
+            'quizPackages',
+            'selectedAssignment'
+        ));
+    }
 
-            if (!$exists) {
-                DB::table('course_enrollments')->insert([
-                    'student_id' => $studentId,
-                    'course_id' => $courseId,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
+    /**
+     * Update course details.
+     */
+    public function update(UpdateCourseRequest $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $course = Course::findOrFail($id);
+
+            if (!$course) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Khóa học không tồn tại.');
             }
-        }
 
-        return redirect()->route('courses.show', $courseId)
-            ->with('success', 'Học sinh đã được thêm vào khóa học.');
-    }
+            $course->code = $request->code;
+            $course->name = $request->name;
+            $course->description = $request->description;
+            $course->status = 'published';
+            $course->save();
 
-
-    public function importConfirm(Request $request, $course_id)
-    {
-        $students = $request->input('students');
-        $successMessages = [];
-        $errorMessages = [];
-
-        if (empty($students)) {
-            return response()->json([
-                'success' => false,
-                'errorMessages' => ['Không có học sinh nào được gửi để nhập.'],
-            ], 422);
-        }
-
-        foreach ($students as $studentData) {
-            $student = User::where('email', $studentData['email'])->first();
-
-            if ($student && $student->role_id == 3) {
-                $enrollmentExists = DB::table('course_enrollments')
-                    ->where('course_id', $course_id)
-                    ->where('student_id', $student->id)
-                    ->exists();
-
-                if (!$enrollmentExists) {
-                    DB::table('course_enrollments')->insert([
-                        'course_id' => $course_id,
-                        'student_id' => $student->id,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ]);
-                    $successMessages[] = "Học sinh {$student->name} ({$student->email}) đã được thêm thành công.";
-                } else {
-                    $errorMessages[] = "Học sinh {$student->name} ({$student->email}) đã tồn tại trong khóa học.";
-                }
-            } else {
-                $errorMessages[] = "Học sinh với email {$studentData['email']} không tồn tại hoặc không phải là học sinh.";
+            if ($request->has('categories')) {
+                $course->categories()->sync($request->categories);
             }
-        }
 
-        return response()->json([
-            'success' => true,
-            'successMessages' => $successMessages,
-            'errorMessages' => $errorMessages,
-        ]);
+            DB::commit();
+            return redirect()->back()->with('success', 'Update course successfully');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
+        }
     }
 
-    public function downloadTemplate()
+    /**
+     * Change course status.
+     */
+    public function destroy($id)
     {
-        $headers = ['Tên học sinh', 'Email'];
+        DB::beginTransaction();
+        try {
+            $course = Course::findOrFail($id);
+
+            if (!$course) {
+                DB::rollBack();
+                return redirect()->back()->with('error', 'Course not found.');
+            }
+
+            $course->status = $course->status === 'published' ? 'archived' : 'published';
+            $course->save();
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Updated course status successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Đã xảy ra lỗi: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Export course details to Excel.
+     */
+    public function export($id)
+    {
+        $course = Course::find($id)->load(['categories', 'students']);
+
+        $categories = $course->categories->pluck('name')->implode(', ');
+        $students = $course->students;
 
         $data = [
-            ['Tên học sinh 1', 'email1@example.com'],
-            ['Tên học sinh 2', 'email2@example.com'],
-            ['Tên học sinh 3', 'email3@example.com'],
+            ['Thông tin lớp học'],
+            ['Tên lớp', $course->name],
+            ['Mã lớp', $course->code],
+            ['Trạng thái', $course->status === 'published' ? 'Mở khoá' : 'Khoá'],
+            ['Danh mục', $categories],
+
+            [],
+            ['Danh sách học sinh'],
+            ['STT', 'Tên học sinh', 'Email'],
         ];
 
-        $dataWithHeaders = array_merge([$headers], $data);
+        foreach ($students as $key => $student) {
+            $data[] = [
+                $key + 1,
+                $student->name,
+                $student->email,
+            ];
+        }
 
-        $fileName = 'student_import_template.xlsx';
+        $fileName = 'course-' . $course->id . '-details.xlsx';
 
-        return Excel::download(new class($dataWithHeaders) implements FromArray {
+        return Excel::download(new class($data) implements FromArray {
             protected $data;
 
             public function __construct($data)
@@ -292,28 +239,5 @@ class CourseController extends Controller
                 return $this->data;
             }
         }, $fileName);
-    }
-
-    public function removeStudent(Request $request, $courseId)
-    {
-        $course = Course::findOrFail($courseId);
-        $studentIds = $request->input('student_ids');
-
-        foreach ($studentIds as $studentId) {
-            $exists = DB::table('course_enrollments')
-                ->where('course_id', $courseId)
-                ->where('student_id', $studentId)
-                ->exists();
-
-            if ($exists) {
-                DB::table('course_enrollments')
-                    ->where('course_id', $courseId)
-                    ->where('student_id', $studentId)
-                    ->delete();
-            }
-        }
-
-        return redirect()->route('courses.show', $courseId)
-            ->with('success', 'Học sinh đã được xóa khỏi khóa học.');
     }
 }
