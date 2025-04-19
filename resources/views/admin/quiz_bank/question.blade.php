@@ -20,7 +20,7 @@
                         @foreach ($questions as $key => $question)
                             <li class="list-row">
                                 <div>{{ ++$key }}</div>
-                                <div>
+                                <div class="flex-grow">
                                     <div class="text-xl">{{ $question['question'] }}</div>
 
                                     @foreach ($question['choices'] as $key => $choice)
@@ -35,9 +35,27 @@
                                         </div>
                                     @endforeach
                                 </div>
+                                <div class="flex items-start">
+                                    <a class="delete-question-btn btn btn-soft btn-error btn-sm" data-id="{{ $question['id'] }}" data-question="{{ $question['question'] }}" href="#">
+                                        <i class="fas fa-trash"></i> {{ __('Delete') }}
+                                    </a>
+                                </div>
                             </li>
                         @endforeach
                     </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div id="deleteConfirmationModal" class="modal">
+            <div class="modal-box">
+                <h3 class="text-lg font-bold">{{ __('Confirm Deletion') }}</h3>
+                <p class="py-4">{{ __('Are you sure you want to delete this question?') }}</p>
+                <p id="questionToDelete" class="py-2 font-semibold"></p>
+                <div class="modal-action">
+                    <button class="btn btn-soft btn-ghost" onclick="document.getElementById('deleteConfirmationModal').classList.remove('modal-open')">{{ __('Cancel') }}</button>
+                    <a id="confirmDeleteBtn" class="btn btn-soft btn-error" href="#">{{ __('Delete') }}</a>
                 </div>
             </div>
         </div>
@@ -259,6 +277,30 @@
                         }
 
                         return true;
+                    });
+
+                    // Handle delete question button click
+                    $('.delete-question-btn').click(function(e) {
+                        e.preventDefault();
+
+                        const questionId = $(this).data('id');
+                        const questionText = $(this).data('question');
+
+                        // Set the question text in the confirmation modal
+                        $('#questionToDelete').text('"' + questionText + '"');
+
+                        // Update the confirm delete button href
+                        $('#confirmDeleteBtn').attr('href', '{{ route('admin.quizBank.question.destroy', '') }}/' + questionId);
+
+                        // Show the confirmation modal using jQuery instead of showModal function
+                        $('#deleteConfirmationModal').addClass('modal-open');
+                    });
+
+                    // Handle cancel button in the modal (additional method)
+                    $(document).on('click', function(e) {
+                        if ($(e.target).hasClass('modal') && $(e.target).hasClass('modal-open')) {
+                            $('#deleteConfirmationModal').removeClass('modal-open');
+                        }
                     });
                 });
             </script>
