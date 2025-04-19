@@ -39,6 +39,12 @@
                             {{ __('Quiz Bank') }}
                         </x-actions.sidebar-link>
                     </li>
+                    <li>
+                        <x-actions.sidebar-link :href="route('admin.course.index')" :active="request()->routeIs('admin.course.index')">
+                            <x-icons.book-open class="h-5 w-5" />
+                            {{ __('Course') }}
+                        </x-actions.sidebar-link>
+                    </li>
                 </ul>
             </li>
         </ul>
