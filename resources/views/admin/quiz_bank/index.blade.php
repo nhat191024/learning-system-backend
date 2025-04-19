@@ -3,8 +3,11 @@
         <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
             {{ __('Quiz bank management') }}
         </h2>
-        <a class="btn btn-soft btn-info">{{ __('Add new quiz bank') }}</a>
+        <a class="btn btn-soft btn-info" onclick="createQuizBank.showModal()">{{ __('Add new quiz bank') }}</a>
     </x-slot>
+
+    @include('admin.quiz_bank.partials.create')
+
     <div class="py-12">
         <div class="mx-auto max-w-full sm:px-6 lg:px-8">
             <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg dark:bg-gray-800">
@@ -41,11 +44,8 @@
                                         <a class="btn btn-soft btn-info join-item" href="{{ route('admin.quizBank.questions', $bank->id) }}">
                                             {{ __('Questions') }}
                                         </a>
-                                        <a class="btn btn-soft btn-warning join-item">
+                                        <a class="btn btn-soft btn-warning join-item" href="{{ route('admin.quizBank.edit', $bank->id) }}">
                                             {{ __('Edit') }}
-                                        </a>
-                                        <a class="btn btn-soft btn-error join-item">
-                                            {{ __('Deactivate') }}
                                         </a>
                                     </div>
                                 </td>
