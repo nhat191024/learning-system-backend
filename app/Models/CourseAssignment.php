@@ -11,7 +11,8 @@ class CourseAssignment extends Model
         'video_url',
         'title',
         'description',
-        'duration'
+        'duration',
+        'status',
     ];
 
     public function course()
