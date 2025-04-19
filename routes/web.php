@@ -18,6 +18,8 @@ Route::prefix('admin')->middleware(['auth', 'verified'])->name('admin.')->group(
     require __DIR__ . '/admin/category.php';
     require __DIR__ . '/admin/class_assignment.php';
     require __DIR__ . '/admin/quiz_bank.php';
+    require __DIR__ . '/admin/course.php';
+    require __DIR__ . '/admin/course_assignment.php';
 });
 
 Route::middleware('auth')->group(function () {
