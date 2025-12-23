@@ -1,0 +1,13 @@
+localhost:443 {
+    root * /var/www/public
+    php_fastcgi laravel-app:9000
+    file_server
+    encode gzip
+
+    tls internal
+
+    log {
+        output stdout
+        format console
+    }
+}

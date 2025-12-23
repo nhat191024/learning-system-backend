@@ -21,3 +21,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/dumb
+/.VSCodeCounter
+/public/upload/avt

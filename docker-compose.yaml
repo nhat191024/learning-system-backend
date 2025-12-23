@@ -1,0 +1,12 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: learning-system-web
+    container_name: learning-system-web
+    restart: unless-stopped
+    ports:
+      - "10000:80"
+    volumes:
+      - .:/var/www/html
